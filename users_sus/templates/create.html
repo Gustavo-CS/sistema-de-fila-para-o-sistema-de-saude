@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Create
+{% endblock %}
+
+{% block main %}
+    <button type="button" class="btn btn-danger" id="normal-button" onclick="generateCode('N')">Normal</button>
+    <button type="button" class="btn btn-danger" id="priority-button"  onclick="generateCode('P')">Prioritario</button>
+
+
+    <script>
+        const socket = new WebSocket(`ws://${window.location.host}/ws/codes/`)
+        console.log(socket)
+
+
+        socket.onmessage 
+
+
+        function generateCode(type_of_code) {
+            socket.send(JSON.stringify({ action: "new_code", type_of_code: type_of_code }));
+        }
+
+        function createCode() {
+            const typeOfCode = document.getElementById('type_of_code').value;
+
+            const message = JSON.stringify({
+                type_of_code: typeOfCode
+            });
+
+            socket.send(message);
+        }
+
+    </script>
+{% endblock %}
