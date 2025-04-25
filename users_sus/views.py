@@ -43,17 +43,17 @@ def login_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
-        user = User.objects.get(email=email)
-        username = user.username
-        id = user.id
-        if user.check_password(password):
-            login(request, user)
-            request.session['username'] = username
-            request.session['id'] = id
-            return redirect("/")
-        else:
-            print(user)
-            print('Email ou senha inválidos')
+        try:
+            user = User.objects.get(email=email)
+            username = user.username
+            id = user.id
+            if user.check_password(password):
+                login(request, user)
+                request.session['username'] = username
+                request.session['id'] = id
+                return redirect("/")
+        except User.DoesNotExist:
+            print("No user found with that email.")
     return render(request, "login.html")
 
 
