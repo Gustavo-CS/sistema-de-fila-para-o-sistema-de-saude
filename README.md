@@ -29,6 +29,17 @@ Em seguida você deve realizar os seguintes comandos para criar as tables do ban
 ```bash
   python3 manage.py migrate
 ```
+Em seguida você deve realizar os seguintes comandos para fazer a tabela users_sus funcionar
+
+```bash
+  python3 manage.py makemigrations users_sus
+```
+
+```bash
+  python3 manage.py migrate users_sus
+```
+
+
 Por fim rodando o seguinte comando você iniciara o servidor de desenvolvimento
 
 ```bash
