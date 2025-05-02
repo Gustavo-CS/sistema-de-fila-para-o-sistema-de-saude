@@ -106,3 +106,7 @@ def logout_view(request):
 
 def create_view(request):
     return render(request, "create.html")
+
+
+def scheduling_view(request):
+    return render(request, "scheduling.html")

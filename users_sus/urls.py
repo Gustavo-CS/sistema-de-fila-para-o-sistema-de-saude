@@ -10,4 +10,6 @@ urlpatterns = [
     path("create/", views.create_view, name="create"),
     
     path('auth-receiver', views.auth_receiver, name='auth_receiver'),
+    path("scheduling/", views.scheduling_view, name="scheduling"),
+
 ]
