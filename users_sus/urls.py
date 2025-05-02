@@ -1,5 +1,6 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
+from django.contrib import admin
 
 urlpatterns = [
     path("", views.index, name="index"),
@@ -7,4 +8,6 @@ urlpatterns = [
     path("login/", views.login_view, name="login_view"),
     path("logout/", views.logout_view, name="logout"),
     path("create/", views.create_view, name="create"),
+    
+    path('auth-receiver', views.auth_receiver, name='auth_receiver'),
 ]

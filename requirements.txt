@@ -23,3 +23,8 @@ Twisted==24.11.0
 txaio==23.1.1
 typing_extensions==4.13.2
 zope.interface==7.2
+
+dotenv==0.9.9
+google-api-python-client==2.169.0
+
+PyJWT==2.10.1
