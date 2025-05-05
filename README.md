@@ -12,6 +12,8 @@ Para rodar esse projeto, você vai precisar adicionar as seguintes variáveis de
 
 `SECRET_KEY` = "Exemplo123"
 
+`GOOGLE_OAUTH_CLIENT_ID`="215611290671-8ddprj97a3i1jq9rkl6jdhuv7uacesck.apps.googleusercontent.com"
+
 
 ## Rodando o programa
 
@@ -23,27 +25,27 @@ Para poder rodar o programa você deve primeiramente baixar as dependências nec
 Em seguida você deve realizar os seguintes comandos para criar as tables do banco de dados
 
 ```bash
-  python3 manage.py makemigrations
+  python manage.py makemigrations
 ```
 
 ```bash
-  python3 manage.py migrate
+  python manage.py migrate
 ```
 Em seguida você deve realizar os seguintes comandos para fazer a tabela users_sus funcionar
 
 ```bash
-  python3 manage.py makemigrations users_sus
+  python manage.py makemigrations users_sus
 ```
 
 ```bash
-  python3 manage.py migrate users_sus
+  python manage.py migrate users_sus
 ```
 
 
 Por fim rodando o seguinte comando você iniciara o servidor de desenvolvimento
 
 ```bash
-  python3 manage.py runserver
+  python manage.py runserver
 ```
 ## Autores
 
