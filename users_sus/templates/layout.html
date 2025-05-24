@@ -20,6 +20,8 @@
       integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
       crossorigin="anonymous"
     ></script>
+
+    <link rel="shortcut icon" href="../static/imgs/favicon-32x32.png" type="image/x-icon">
     
     <title>{% block title %}{% endblock %}</title>
 </head>
@@ -33,9 +35,11 @@
     </div>
     {% if request.session.username %}
     <ul class="navbar-nav ms-auto">
+      {% if request.session.employee_id %}
       <li class="nav-item mx-2">
         <a class="nav-link" href="/create">Create</a>
       </li>
+      {% endif %}
       <li class="nav-item mx-2">
         <a class="nav-link" href="/logout">Logout</a>
       </li>
@@ -62,6 +66,7 @@
     </ul>
     {% endif %}
     </nav>
+    <p>{{ request.session.items }}</p>
     <main>{% block main %}{% endblock %}</main>
 </body>
 </html>

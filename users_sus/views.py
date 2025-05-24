@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
-from users_sus.models import User, Code
+from users_sus.models import User, Code, Worker, Patient
 
 import os
 
@@ -60,6 +60,16 @@ def register_view(request):
 
         if not request.POST.get('date'):
             return redirect("/register")
+        
+        if not request.POST.get('address'):
+            return redirect("/register")
+        
+        if not request.POST.get('phone'):
+            return redirect("/register")
+        
+
+        if len(request.POST.get('phone')) != 11 or not request.POST.get('phone').isdigit():
+            return redirect("/register")
 
         if request.POST.get('password') != request.POST.get('confirmation'):
             return redirect("/register")
@@ -67,12 +77,17 @@ def register_view(request):
         username = request.POST.get('username')
         email = request.POST.get('email')
         password = request.POST.get('password')
-        date =request.POST.get('date')
+        date = request.POST.get('date')
+        phone_number = request.POST.get('phone')
+        address = request.POST.get('address')
 
         print(username, email, password, date)
         user = User(username=username, email=email, birth_date=date)
         user.set_password(password)
         user.save()
+
+        patient = Patient(phone_number=phone_number, address=address, user=user)
+        patient.save()
         return redirect("/login")
 
 
@@ -87,15 +102,41 @@ def login_view(request):
         password = request.POST.get('password')
         try:
             user = User.objects.get(email=email)
-            username = user.username
-            id = user.id
-            if user.check_password(password):
-                login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-                request.session['username'] = username
-                request.session['id'] = id
-                return redirect("/")
+            try:
+                patient = Patient.objects.get(user=user)
+                id = str(patient.patient_id)
+                username = user.username
+                if user.check_password(password):
+                    login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                    request.session['username'] = username
+                    request.session['patient_id'] = id
+                    return redirect("/")
+            except Patient.DoesNotExist:
+                return render(request, "login.html")
         except User.DoesNotExist:
             print("No user found with that email.")
+    return render(request, "login.html")
+
+
+def login_worker(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        try:
+            user = User.objects.get(email=email)
+            try:
+                worker = Worker.objects.get(user=user)
+                id = str(worker.employee_id)
+                username = user.username
+                if user.check_password(password):
+                    login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                    request.session['username'] = username
+                    request.session['employee_id'] = id
+                    return redirect("/")
+            except Worker.DoesNotExist:
+                return render(request, "login.html")
+        except User.DoesNotExist:
+            print("No worker found with that email.")
     return render(request, "login.html")
 
 
