@@ -38,7 +38,7 @@ Em seguida você deve realizar os seguintes comandos para fazer a tabela users_s
 ```
 
 ```bash
-  python manage.py migrate users_sus
+  python manage.py makemigrations users_sus
 ```
 
 
