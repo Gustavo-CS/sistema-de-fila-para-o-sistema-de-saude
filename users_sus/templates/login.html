@@ -6,8 +6,15 @@
 
 {% block main %}
 
-<script src="https://accounts.google.com/gsi/client" async></script>
-<div class="container py-5">
+    <script src="https://accounts.google.com/gsi/client" async></script>
+    <div class="container py-5">
+        
+        {% if error %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+        {% endif %}
+
     <h2>Paciente</h2>
     <form action="/login/" method="post">
         {% csrf_token %}

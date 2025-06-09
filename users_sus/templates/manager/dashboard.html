@@ -1,0 +1,194 @@
+{# users_sus/templates/manager/dashboard.html #}
+{% extends "layout.html" %} {# Assumindo que você tem um layout.html base #}
+
+{% block title %}
+    Painel de Gestão - {{ health_unit.name }}
+{% endblock %}
+
+{% block main %}
+<div class="container mt-4">
+    <h1 class="mb-4">Painel de Gestão - {{ health_unit.name }}</h1>
+
+    <div class="row">
+        {# Cartão para a senha atualmente sendo chamada #}
+        <div class="col-md-6 mb-4">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Chamando Senha</h5>
+                    <div id="calling-code-display">
+                        {% if calling_code %}
+                            <p class="card-text display-4">
+                                {{ calling_code.get_type_of_code_display }} {{ calling_code.code }}
+                            </p>
+                            <p class="card-text">Chamada às: {{ calling_code.called_at|date:"H:i:s" }} por {{ calling_code.called_by.user.username }}</p>
+                            <form action="{% url 'update_code_status' calling_code.id %}" method="post" style="display:inline;" class="form-update-status">
+                                {% csrf_token %}
+                                <input type="hidden" name="status" value="{{ StatusSenha.EM_ATENDIMENTO }}">
+                                <button type="submit" class="btn btn-success me-2">Atender</button>
+                            </form>
+                            <form action="{% url 'update_code_status' calling_code.id %}" method="post" style="display:inline;" class="form-update-status">
+                                {% csrf_token %}
+                                <input type="hidden" name="status" value="{{ StatusSenha.PERDEU }}">
+                                <button type="submit" class="btn btn-warning me-2">Perdeu a Vez</button>
+                            </form>
+                            <form action="{% url 'update_code_status' calling_code.id %}" method="post" style="display:inline;" class="form-update-status">
+                                {% csrf_token %}
+                                <input type="hidden" name="status" value="{{ StatusSenha.CANCELADO }}">
+                                <button type="submit" class="btn btn-danger">Cancelar Chamada</button>
+                            </form>
+                        {% else %}
+                            <p class="card-text">Nenhuma senha sendo chamada no momento.</p>
+                        {% endif %}
+                    </div>
+                    <form action="{% url 'call_next_code' %}" method="post" class="mt-3 form-call-next">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-light btn-lg">Chamar Próxima Senha</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {# Cartão para a senha atualmente em atendimento #}
+        <div class="col-md-6 mb-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Em Atendimento</h5>
+                    <div id="in-service-code-display">
+                        {% if in_service_code %}
+                            <p class="card-text display-4">
+                                {{ in_service_code.get_type_of_code_display }} {{ in_service_code.code }}
+                            </p>
+                            <p class="card-text">Iniciou às: {{ in_service_code.called_at|date:"H:i:s" }} por {{ in_service_code.called_by.user.username }}</p>
+                            <form action="{% url 'update_code_status' in_service_code.id %}" method="post" class="form-update-status">
+                                {% csrf_token %}
+                                <input type="hidden" name="status" value="{{ StatusSenha.ATENDIDO }}">
+                                <button type="submit" class="btn btn-success me-2">Concluir Atendimento</button>
+                            </form>
+                            <form action="{% url 'update_code_status' in_service_code.id %}" method="post" class="form-update-status">
+                                {% csrf_token %}
+                                <input type="hidden" name="status" value="{{ StatusSenha.CANCELADO }}">
+                                <button type="submit" class="btn btn-danger">Cancelar Atendimento</button>
+                            </form>
+                        {% else %}
+                            <p class="card-text">Nenhuma senha em atendimento.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        {# Lista de senhas aguardando #}
+        <div class="col-md-8 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Senhas Aguardando na Fila ({{ waiting_codes|length }})</h5>
+                    <ul id="waiting-codes-list" class="list-group">
+                        {% for code in waiting_codes %}
+                            <li class="list-group-item">
+                                **{{ code.get_type_of_code_display }} {{ code.code }}** - Criada em: {{ code.created|date:"H:i:s" }}
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item">Nenhuma senha aguardando no momento.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        {# Lista de últimas senhas atendidas #}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Últimas Atendidas</h5>
+                    <ul id="attended-codes-list" class="list-group">
+                        {% for code in attended_codes %}
+                            <li class="list-group-item">
+                                **{{ code.get_type_of_code_display }} {{ code.code }}** - Atendida em: {{ code.attended_at|date:"H:i:s" }}
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item">Nenhuma senha atendida recentemente.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Conecta ao WebSocket da fila da unidade de saúde atual
+    const healthUnitId = "{{ health_unit.id }}"; // Obtém o ID da unidade do contexto Django
+    const queueSocket = new WebSocket(
+        'ws://' + window.location.host + '/ws/queue/' + healthUnitId + '/'
+    );
+
+    // Manipula mensagens recebidas do WebSocket
+    queueSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        console.log('Mensagem WebSocket recebida:', data);
+
+        location.reload(); 
+    };
+
+    queueSocket.onclose = function(e) {
+        console.error('Conexão WebSocket da fila fechada inesperadamente:', e);
+    };
+
+    queueSocket.onerror = function(e) {
+        console.error('Erro no WebSocket da fila:', e);
+    };
+
+    // Função para enviar requisições POST via Fetch API (para os botões)
+    function sendPostRequest(url, formData) {
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken') // Pega o token CSRF do formulário
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Ação bem-sucedida:', data);
+                // A atualização via WebSocket vai recarregar a página,
+                // mas se não usasse reload, aqui seria a lógica de atualização da UI
+            } else {
+                console.error('Erro na ação:', data.error);
+                alert('Erro: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao enviar requisição:', error);
+            alert('Ocorreu um erro ao processar a requisição.');
+        });
+    }
+
+    // Adiciona event listeners para os formulários de chamar próxima e atualizar status
+    document.addEventListener('DOMContentLoaded', function() {
+        // Formulário Chamar Próxima
+        const callNextForm = document.querySelector('.form-call-next');
+        if (callNextForm) {
+            callNextForm.addEventListener('submit', function(event) {
+                event.preventDefault(); // Impede o envio padrão do formulário
+                const url = callNextForm.action;
+                const formData = new FormData(callNextForm);
+                sendPostRequest(url, formData);
+            });
+        }
+
+        // Formulários de Atualizar Status (para todos os botões de status)
+        const updateStatusForms = document.querySelectorAll('.form-update-status');
+        updateStatusForms.forEach(form => {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault(); // Impede o envio padrão do formulário
+                const url = form.action;
+                const formData = new FormData(form);
+                sendPostRequest(url, formData);
+            });
+        });
+    });
+</script>
+{% endblock %}
