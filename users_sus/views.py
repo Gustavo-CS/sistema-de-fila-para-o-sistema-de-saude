@@ -139,34 +139,36 @@ def login_worker(request):
         
         try:
             user = User.objects.get(email=email)
-            print(f"Usuário encontrado: {user.email}") 
+            print(f"Usuário encontrado: {user.email}")
             print(f"Usuário é staff: {user.is_staff}")
-            print(f"Usuário tem worker associado: {hasattr(user, 'worker')}") 
+            print(f"Usuário tem worker associado: {hasattr(user, 'worker')}")
 
             if not hasattr(user, 'worker') or not user.is_staff:
-                print("ERRO: Usuário não é um worker ou não é staff.") 
+                print("ERRO: Usuário não é um worker ou não é staff.")
                 return render(request, "login.html", {'error': 'Credenciais inválidas ou não é um funcionário autorizado.'})
 
             # Se o usuário é um Worker, tenta fazer o login
             if user.check_password(password):
-                print("Senha CORRETA. Logando e redirecionando.") # NOVO
+                print("Senha CORRETA. Logando e redirecionando.")
                 login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                
+                request.session.save() 
+                print("Sessão salva.") 
+
                 request.session['username'] = user.username
                 request.session['employee_id'] = str(user.worker.employee_id)
                 
                 return redirect(reverse('manager_dashboard'))
 
             else:
-                print("ERRO: Senha INCORRETA.") 
+                print("ERRO: Senha INCORRETA.")
                 return render(request, "login.html", {'error': 'Senha incorreta.'})
         except User.DoesNotExist:
-            print("ERRO: Usuário NÃO ENCONTRADO com este email.") 
+            print("ERRO: Usuário NÃO ENCONTRADO com este email.")
             return render(request, "login.html", {'error': 'Usuário não encontrado.'})
     
     print("Requisição GET ou não POST. Renderizando formulário.")
     return render(request, "login.html")
-
-
 
 def logout_view(request):
     logout(request)

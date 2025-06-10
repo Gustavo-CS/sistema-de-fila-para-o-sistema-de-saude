@@ -1,21 +1,73 @@
+{# users_sus/templates/create.html #}
 {% extends "layout.html" %}
 
 {% block title %}
-    Create
+    Criar Senha
 {% endblock %}
 
 {% block main %}
-    <button type="button" class="btn btn-danger" id="normal-button" onclick="generateCode('N')">Normal</button>
-    <button type="button" class="btn btn-danger" id="priority-button"  onclick="generateCode('P')">Prioritario</button>
-
+    <div class="container mt-4">
+        <h1>Tirar Senha</h1>
+        <p>Selecione o tipo de senha desejado:</p>
+        <button type="button" class="btn btn-danger" id="normal-button" onclick="generateCode('N')">Normal</button>
+        <button type="button" class="btn btn-danger" id="priority-button" onclick="generateCode('P')">Prioritario</button>
+        <p id="senhaGerada" class="mt-3" style="font-size: 2em; color: green;"></p>
+    </div>
 
     <script>
-        const socket = new WebSocket(`ws://${window.location.host}/ws/codes/`)
-        console.log(socket);
-        
-        function generateCode(type_of_code) {
-            socket.send(JSON.stringify({type_of_code: type_of_code }));
+        // ==============================================================
+        // SUBSTITUA PELO UUID DA SUA HEALTHUNIT REAL!
+        // pegar esse UUID no painel admin onde criado a HealthUnit.
+        const HEALTH_UNIT_ID = "62d1ca25-e6df-4246-accd-17869aef97f4"; 
+
+        if (HEALTH_UNIT_ID === "62d1ca25-e6df-4246-accd-17869aef97f4") {
+            console.error("ERRO: Substitua 'SEU_UUID_REAL_AQUI' no create.html pelo ID real da sua HealthUnit.");
+            alert("Por favor, substitua o placeholder do ID da HealthUnit no create.html antes de usar.");
         }
+
+        let socket; 
+
+        function connectWebSocket() {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                return; // Já conectado
+            }
+
+            socket = new WebSocket(`ws://${window.location.host}/ws/queue/${HEALTH_UNIT_ID}/`);
+
+            socket.onopen = function(e) {
+                console.log("WebSocket connected to queue for Health Unit:", HEALTH_UNIT_ID);
+            };
+
+            socket.onmessage = function(e) {
+                const data = JSON.parse(e.data);
+                console.log('Mensagem WebSocket recebida:', data);
+                if (data.type === 'code_sent') {
+                    document.getElementById('senhaGerada').innerText = `Sua senha: ${data.message.type_of_code} ${data.message.code}`;
+                } else {
+                    console.log('Mensagem de atualização da fila (ignorado no create.html):', data);
+                }
+            };
+
+            socket.onclose = function(e) {
+                console.error('WebSocket disconnected, attempting to reconnect...');
+                setTimeout(connectWebSocket, 1000); // Tenta reconectar após 1 segundo
+            };
+
+            socket.onerror = function(e) {
+                console.error('WebSocket error:', e);
+            };
+        }
+
+        function generateCode(type_of_code) {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({type_of_code: type_of_code }));
+            } else {
+                alert('WebSocket não está conectado. Tentando reconectar...');
+                connectWebSocket(); // Tenta reconectar se não estiver aberto
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', connectWebSocket);
 
     </script>
 {% endblock %}
