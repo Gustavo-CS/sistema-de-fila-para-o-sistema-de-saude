@@ -17,11 +17,11 @@
     <script>
         // ==============================================================
         // SUBSTITUA PELO UUID DA SUA HEALTHUNIT REAL!
+        const HEALTH_UNIT_ID = "62d1ca25-e6df-4246-accd-17869aef97f4"; // <-- Use o UUID EXATO que você obteve do admin!
+        // ==============================================================
         // pegar esse UUID no painel admin onde criado a HealthUnit.
-        const HEALTH_UNIT_ID = "62d1ca25-e6df-4246-accd-17869aef97f4"; 
-
         if (HEALTH_UNIT_ID === "62d1ca25-e6df-4246-accd-17869aef97f4") {
-            console.error("ERRO: Substitua 'SEU_UUID_REAL_AQUI' no create.html pelo ID real da sua HealthUnit.");
+            console.error("ERRO: Substitua 'COLE_O_UUID_DA_SUA_HEALTHUNIT_AQUI' no create.html pelo ID real da sua HealthUnit.");
             alert("Por favor, substitua o placeholder do ID da HealthUnit no create.html antes de usar.");
         }
 
@@ -31,13 +31,13 @@
             if (socket && socket.readyState === WebSocket.OPEN) {
                 return; // Já conectado
             }
-
+            // URL do WebSocket agora com o health_unit_id
             socket = new WebSocket(`ws://${window.location.host}/ws/queue/${HEALTH_UNIT_ID}/`);
-
+            
             socket.onopen = function(e) {
                 console.log("WebSocket connected to queue for Health Unit:", HEALTH_UNIT_ID);
             };
-
+            
             socket.onmessage = function(e) {
                 const data = JSON.parse(e.data);
                 console.log('Mensagem WebSocket recebida:', data);
@@ -50,7 +50,7 @@
 
             socket.onclose = function(e) {
                 console.error('WebSocket disconnected, attempting to reconnect...');
-                setTimeout(connectWebSocket, 1000); // Tenta reconectar após 1 segundo
+                setTimeout(connectWebSocket, 1000);// Tenta reconectar após 1 segundo
             };
 
             socket.onerror = function(e) {
@@ -63,11 +63,10 @@
                 socket.send(JSON.stringify({type_of_code: type_of_code }));
             } else {
                 alert('WebSocket não está conectado. Tentando reconectar...');
-                connectWebSocket(); // Tenta reconectar se não estiver aberto
+                connectWebSocket();// Tenta reconectar se não estiver aberto
             }
         }
 
         document.addEventListener('DOMContentLoaded', connectWebSocket);
 
     </script>
-{% endblock %}
