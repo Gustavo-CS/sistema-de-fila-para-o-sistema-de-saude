@@ -112,7 +112,7 @@ class Code(models.Model):
     called_by = models.ForeignKey(Worker, on_delete=models.SET_NULL, null=True, blank=True, related_name='called_codes')
     health_unit = models.ForeignKey(HealthUnit, on_delete=models.CASCADE, related_name='codes') 
 
-
+    
     class Meta:
         ordering = ['created']
 
