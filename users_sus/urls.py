@@ -10,8 +10,9 @@ urlpatterns = [
     path("logout/", views.logout_view, name="logout"),
     path("create/", views.create_view, name="create"),
     path("manager/", include("users_sus.manager_urls")),
+    path('feedback/', views.feedback, name='feedback'),
+    path('unidades_por_estado/', views.unidades_por_estado_view, name='unidades_por_estado'),
     
     path('auth-receiver', views.auth_receiver, name='auth_receiver'),
     path("scheduling/", views.scheduling_view, name="scheduling"),
-
 ]

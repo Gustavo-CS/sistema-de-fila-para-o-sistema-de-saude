@@ -1,7 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import login, logout
-from users_sus.models import User, Code, Worker, Patient, HealthUnit, TipoSenha, StatusSenha
-from django.urls import reverse 
+from users_sus.models import User, Code, Worker, Patient, HealthUnit, TipoSenha, StatusSenha, Feedback
+from django.urls import reverse
+from django.views.decorators.http import require_GET
 
 import os
 
@@ -9,6 +10,8 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from google.oauth2 import id_token
 from google.auth.transport import requests
+from .forms import FeedbackForm
+from .choices import UNIDADES_POR_ESTADO
 
 
 
@@ -181,3 +184,69 @@ def create_view(request):
 
 def scheduling_view(request):
     return render(request, "scheduling.html")
+
+def feedback(request):
+    estado_selecionado = request.GET.get('estado', '')
+    unidade_selecionada = request.GET.get('unidade', '')
+
+    feedbacks_qs = Feedback.objects.none()
+
+    if estado_selecionado:
+        unidades_do_estado = [codigo for codigo, nome in UNIDADES_POR_ESTADO.get(estado_selecionado, [])]
+
+        if unidade_selecionada and unidade_selecionada != 'todas':
+            feedbacks_qs = Feedback.objects.filter(unidade_sus=unidade_selecionada).order_by('-criado_em')
+        else:
+            feedbacks_qs = Feedback.objects.filter(unidade_sus__in=unidades_do_estado).order_by('-criado_em')
+
+
+    feedbacks_processados = []
+    for fb in feedbacks_qs:
+        nome_unidade = None
+        for unidades in UNIDADES_POR_ESTADO.values():
+            for codigo, nome in unidades:
+                if codigo == fb.unidade_sus:
+                    nome_unidade = nome
+        feedbacks_processados.append({
+            'titulo': fb.titulo,
+            'comentario': fb.comentario,
+            'criado_em': fb.criado_em,
+            'user': fb.user,
+            'unidade_nome': nome_unidade or fb.unidade_sus,
+        })
+
+    if request.method == 'POST':
+        form = FeedbackForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            Feedback.objects.create(
+                user=request.user,
+                unidade_sus=data['unidade_sus'],
+                titulo=data['titulo'],
+                comentario=data['comentario']
+            )
+            return redirect('feedback')
+    else:
+        form = FeedbackForm()
+
+    estados_choices = [(sigla, sigla) for sigla in UNIDADES_POR_ESTADO.keys()]
+    unidades_do_estado = UNIDADES_POR_ESTADO.get(estado_selecionado, [])
+
+    unidades_para_filtro = [('todas', 'Todas as unidades')] + unidades_do_estado
+
+    context = {
+        'form': form,
+        'feedbacks': feedbacks_processados,
+        'estado_selecionado': estado_selecionado,
+        'unidade_selecionada': unidade_selecionada,
+        'estados_choices': estados_choices,
+        'unidades_para_filtro': unidades_para_filtro,
+    }
+    return render(request, 'feedback.html', context)
+
+
+@require_GET
+def unidades_por_estado_view(request):
+    estado = request.GET.get('estado')
+    unidades = UNIDADES_POR_ESTADO.get(estado, [])
+    return JsonResponse(unidades, safe=False)

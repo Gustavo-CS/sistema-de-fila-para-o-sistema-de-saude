@@ -1,0 +1,137 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Feedback
+{% endblock %}
+
+{% block main %}
+<div class="container py-3" style="max-width: 700px;">
+
+    <h2 class="mb-4">Enviar Feedback</h2>
+
+    <form method="post" id="feedback-form" novalidate>
+        {% csrf_token %}
+        <div class="mb-3">
+            {{ form.estado.label_tag }}
+            {{ form.estado }}
+        </div>
+        <div class="mb-3">
+            {{ form.unidade_sus.label_tag }}
+            {{ form.unidade_sus }}
+        </div>
+        <div class="mb-3">
+            {{ form.titulo.label_tag }}
+            {{ form.titulo }}
+        </div>
+        <div class="mb-3">
+            {{ form.comentario.label_tag }}
+            {{ form.comentario }}
+        </div>
+        <button type="submit" class="btn btn-primary">Enviar</button>
+    </form>
+
+    <hr class="my-4">
+
+    <h3>Feedbacks</h3>
+
+    <form method="get" id="filtro-feedbacks" class="row g-3 mb-4">
+        <div class="col-md-6">
+            <label for="filtro-estado" class="form-label">Estado</label>
+            <select id="filtro-estado" name="estado" class="form-select">
+                <option value="">Selecione um estado</option>
+                {% for sigla, nome in estados_choices %}
+                    <option value="{{ sigla }}" {% if estado_selecionado == sigla %}selected{% endif %}>{{ nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-6">
+            <label for="filtro-unidade" class="form-label">Unidade SUS</label>
+            <select id="filtro-unidade" name="unidade" class="form-select">
+                {% for codigo, nome in unidades_para_filtro %}
+                    <option value="{{ codigo }}" {% if unidade_selecionada == codigo %}selected{% endif %}>{{ nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-12">
+            <button type="submit" class="btn btn-secondary">Filtrar</button>
+            <a href="{% url 'feedback' %}" class="btn btn-outline-secondary">Limpar filtro</a>
+        </div>
+    </form>
+
+    <div class="list-group mb-5" style="max-height: 400px; overflow-y: auto;">
+        {% for fb in feedbacks %}
+        <div class="list-group-item list-group-item-action flex-column align-items-start">
+            <h5>{{ fb.user.username }} — {{ fb.unidade_nome }}</h5>
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">{{ fb.titulo }}</h5>
+            </div>
+            <p class="mb-1">{{ fb.comentario }}</p>
+            <small>{{ fb.criado_em|date:"d/m/Y H:i" }}</small>
+        </div>
+        {% empty %}
+        <div class="list-group-item">Nenhum feedback encontrado.</div>
+        {% endfor %}
+    </div>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(function() {
+    $('#filtro-estado').change(function() {
+        const estado = $(this).val();
+        const unidadeSelect = $('#filtro-unidade');
+        unidadeSelect.empty();
+
+        if (estado) {
+            $.ajax({
+                url: "{% url 'unidades_por_estado' %}",
+                data: { estado: estado },
+                success: function(data) {
+                    unidadeSelect.append($('<option>').val('todas').text('Todas as unidades'));
+                    if (data.length) {
+                        data.forEach(function(unidade) {
+                            unidadeSelect.append($('<option>').val(unidade[0]).text(unidade[1]));
+                        });
+                    } else {
+                        unidadeSelect.append($('<option>').val('').text('Nenhuma unidade encontrada'));
+                    }
+                }
+            });
+        } else {
+            unidadeSelect.append($('<option>').val('').text('Selecione um estado primeiro'));
+        }
+    });
+
+    $('#id_estado').change(function() {
+        const estado = $(this).val();
+        const unidadeSelect = $('#id_unidade_sus');
+        unidadeSelect.empty();
+
+        if (estado) {
+            $.ajax({
+                url: "{% url 'unidades_por_estado' %}",
+                data: { estado: estado },
+                success: function(data) {
+                    unidadeSelect.append($('<option>').val('').text('Selecione uma unidade'));
+                    if (data.length) {
+                        data.forEach(function(unidade) {
+                            unidadeSelect.append($('<option>').val(unidade[0]).text(unidade[1]));
+                        });
+                    } else {
+                        unidadeSelect.append($('<option>').val('').text('Nenhuma unidade encontrada'));
+                    }
+                }
+            });
+        } else {
+            unidadeSelect.append($('<option>').val('').text('Selecione um estado primeiro'));
+        }
+    });
+
+    $('#filtro-estado').trigger('change');
+    $('#id_estado').trigger('change');
+});
+</script>
+{% endblock %}
