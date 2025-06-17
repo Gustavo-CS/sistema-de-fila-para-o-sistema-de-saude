@@ -59,6 +59,31 @@ def auth_receiver(request):
 
     return redirect('/') 
 
+def queue_display_view(request):
+    # UUID DA UNIDADE DE SAÚDE 
+    health_unit = get_object_or_404(HealthUnit, id='62d1ca25-e6df-4246-accd-17869aef97f4')
+
+    if not health_unit:
+        return render(request, "queue_display.html", {'error': 'Nenhuma unidade de saúde configurada no sistema. Por favor, cadastre uma no painel de administração.'})
+
+    calling_code = Code.objects.filter(
+        health_unit=health_unit,
+        status=StatusSenha.CHAMANDO
+    ).order_by('-called_at').first()
+
+    last_called_or_attended_codes = Code.objects.filter(
+        health_unit=health_unit
+    ).exclude(status__in=[StatusSenha.AGUARDANDO, StatusSenha.CANCELADO, StatusSenha.PERDEU]).order_by('-called_at', '-attended_at')[:10]
+
+    context = {
+        'health_unit': health_unit,
+        'calling_code': calling_code,
+        'last_called_or_attended_codes': last_called_or_attended_codes,
+        'next_waiting_code': Code.objects.filter(health_unit=health_unit, status=StatusSenha.AGUARDANDO).order_by('-type_of_code', 'created').first(),
+    }
+    return render(request, "queue_display.html", context) 
+
+
 
 # Create your views here.
 def index(request):
