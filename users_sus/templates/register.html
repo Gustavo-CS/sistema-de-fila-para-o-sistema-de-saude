@@ -6,30 +6,62 @@
 
 {% block main %}
 <div class="container py-5">
-    <form action="/register/" method="post">
+    <form action="/register/" method="post" onsubmit="return validateForm()">
         {% csrf_token %}
         <div class="mb-3">
-            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="username" name="username" placeholder="Username" type="text">
+            <input required autocomplete="off" autofocus class="form-control mx-auto w-auto" id="username" name="username" placeholder="Nome Completo" type="text">
         </div>
         <div class="mb-3">
-            <input class="form-control mx-auto w-auto" id="email" name="email" placeholder="Email" type="email">
+            <input required class="form-control mx-auto w-auto" id="email" name="email" placeholder="E-mail" type="email">
         </div>
         <div class="mb-3">
-            <input id="date" class="form-control mx-auto w-auto"  id="date" name="date" type="date" />
+            <input required class="form-control mx-auto w-auto" id="dob" name="date" type="date" placeholder="Data de nascimento">
         </div>
         <div class="mb-3">
-            <input id="date" class="form-control mx-auto w-auto"  id="phone" name="phone" placeholder="Phone Number" type="text" />
+            <input required class="form-control mx-auto w-auto" id="phone" name="phone" placeholder="Telefone" type="text">
         </div>
         <div class="mb-3">
-            <input id="date" class="form-control mx-auto w-auto"  id="address" name="address" placeholder="Address" type="text" />
+            <input required class="form-control mx-auto w-auto" id="address" name="address" placeholder="Endereço" type="text">
         </div>
         <div class="mb-3">
-            <input class="form-control mx-auto w-auto" id="password" name="password" placeholder="Password" type="password">
+            <input required class="form-control mx-auto w-auto" id="password" name="password" placeholder="Senha" type="password">
         </div>
         <div class="mb-3">
-            <input class="form-control mx-auto w-auto" id="confirmation" name="confirmation" placeholder="Confirmation" type="password">
+            <input required class="form-control mx-auto w-auto" id="confirmation" name="confirmation" placeholder="Confirme a senha" type="password">
         </div>
-            <button class="btn btn-danger d-block mx-auto" type="submit">Register</button>
+        <div class="text-danger text-center mb-3" id="alertMessage" style="display: none;">
+            Preencha todos os campos corretamente.
+        </div>
+        <button class="btn btn-primary d-block mx-auto w-auto" type="submit">Cadastrar</button>
     </form>
+
+    <p class="text-center mt-4 mb-4 text-muted">
+        Já tem uma conta?
+        <a href="/login" class="text-decoration-none fw-semibold text-primary">
+            Faça Login
+        </a>
+    </p>
 </div>
+
+<script>
+    function validateForm() {
+        const inputs = document.querySelectorAll("form input[required]");
+        let allFilled = true;
+
+        inputs.forEach(input => {
+            if (!input.value.trim()) {
+                allFilled = false;
+            }
+        });
+
+        const alert = document.getElementById("alertMessage");
+        if (!allFilled) {
+            alert.style.display = "block";
+            return false; // impede envio
+        } else {
+            alert.style.display = "none";
+            return true;
+        }
+    }
+</script>
 {% endblock %}

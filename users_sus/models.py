@@ -117,7 +117,7 @@ class Code(models.Model):
         ordering = ['created']
 
     def __str__(self):
-        return self.name
+        return f"{self.get_type_of_code_display()} - {self.code}"
     
 class Feedback(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

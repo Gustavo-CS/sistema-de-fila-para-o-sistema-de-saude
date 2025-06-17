@@ -6,52 +6,79 @@
 
 {% block main %}
 
-    <script src="https://accounts.google.com/gsi/client" async></script>
-    <div class="container py-5">
-        
-        {% if error %}
-            <div class="alert alert-danger" role="alert">
-                {{ error }}
+<script src="https://accounts.google.com/gsi/client" async></script>
+
+<div class="container py-5">
+    {% if error %}
+        <div class="alert alert-primary" role="alert">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs mb-4 justify-content-center" id="loginTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="paciente-tab" data-bs-toggle="tab" data-bs-target="#paciente"
+                type="button" role="tab" aria-controls="paciente" aria-selected="true">Paciente</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="funcionario-tab" data-bs-toggle="tab" data-bs-target="#funcionario"
+                type="button" role="tab" aria-controls="funcionario" aria-selected="false">Funcionário</button>
+        </li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content" id="loginTabsContent">
+        <!-- Paciente -->
+        <div class="tab-pane fade show active" id="paciente" role="tabpanel" aria-labelledby="paciente-tab">
+            <form action="/login/" method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="email" name="email" placeholder="Email" type="text">
+                </div>
+                <div class="mb-3">
+                    <input class="form-control mx-auto w-auto" id="password" name="password" placeholder="Senha" type="password">
+                </div>
+                <div class="mb-3">
+                    <button class="btn btn-primary form-control w-auto mx-auto d-block" type="submit">Log In</button>
+                </div>
+                <p class="text-center mb-4 text-muted">
+                    Não tem uma conta?
+                    <a href="/register" class="text-decoration-none fw-semibold text-primary">
+                        Crie uma conta
+                    </a>
+                </p>
+            </form>
+
+            <div class="h-100 d-flex justify-content-center">
+                <div id="g_id_onload"
+                    data-client_id="215611290671-8ddprj97a3i1jq9rkl6jdhuv7uacesck.apps.googleusercontent.com"
+                    data-context="signin" data-ux_mode="popup" data-login_uri="http://localhost:8000/auth-receiver"
+                    data-auto_prompt="false">
+                </div>
+
+                <div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline"
+                    data-text="signin_with" data-size="large" data-logo_alignment="left">
+                </div>
             </div>
-        {% endif %}
-
-    <h2>Paciente</h2>
-    <form action="/login/" method="post">
-        {% csrf_token %}
-        <div class="mb-3">
-            <input autocomplete="off" autofocus class="form-control mx-auto w-auto " id="email" name="email" placeholder="Email" type="text">
-        </div>
-        <div class="mb-3">
-            <input class="form-control mx-auto w-auto" id="password" name="password" placeholder="Password" type="password">
-        </div>
-        <div class="mb-3">
-            <button class="btn btn-danger d-block mx-auto" type="submit">Log In</button>
-        </div>
-    </form>
-    <div class="h-100 d-flex justify-content-center">
-        <div id="g_id_onload" data-client_id="215611290671-8ddprj97a3i1jq9rkl6jdhuv7uacesck.apps.googleusercontent.com"
-            data-context="signin" data-ux_mode="popup" data-login_uri="http://localhost:8000/auth-receiver"
-            data-auto_prompt="false">
         </div>
 
-        <div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with"
-            data-size="large" data-logo_alignment="left">
+        <!-- Funcionário -->
+        <div class="tab-pane fade" id="funcionario" role="tabpanel" aria-labelledby="funcionario-tab">
+            <form action="/login_worker/" method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <input autocomplete="off" class="form-control mx-auto w-auto" id="email" name="email" placeholder="Email" type="text">
+                </div>
+                <div class="mb-3">
+                    <input class="form-control mx-auto w-auto" id="password" name="password" placeholder="Senha" type="password">
+                </div>
+                <div class="mb-3">
+                    <button class="btn btn-primary d-block mx-auto" type="submit">Log In</button>
+                </div>
+            </form>
         </div>
     </div>
-
-
-    <h2>Funcionario</h2>
-    <form action="/login_worker/" method="post">
-        {% csrf_token %}
-        <div class="mb-3">
-            <input autocomplete="off" autofocus class="form-control mx-auto w-auto " id="email" name="email" placeholder="Email" type="text">
-        </div>
-        <div class="mb-3">
-            <input class="form-control mx-auto w-auto" id="password" name="password" placeholder="Password" type="password">
-        </div>
-        <div class="mb-3">
-            <button class="btn btn-danger d-block mx-auto" type="submit">Log In</button>
-        </div>
-    </form>
 </div>
+
 {% endblock %}
