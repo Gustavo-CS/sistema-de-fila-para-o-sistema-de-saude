@@ -18,9 +18,8 @@
     {% if health_unit %}
         <h1 class="display-3 fw-bold mb-4 queue-title">{{ health_unit.name }}</h1>
 
-        <div class="row w-100 align-items-start justify-content-center"> {# Ajustado para alinhar no topo #}
-            {# COLUNA DA ESQUERDA: Senha Atual #}
-            <div class="col-12 col-md-6 mb-4 d-flex justify-content-center"> {# Centraliza o card na coluna #}
+        <div class="row w-100 align-items-start justify-content-center"> 
+            <div class="col-12 col-md-6 mb-4 d-flex justify-content-center"> 
                 <div class="card p-4 shadow-lg current-code-card">
                     <div class="card-body">
                         <h2 class="card-title display-5 mb-4 text-primary fw-bold">SENHA ATUAL</h2>
@@ -41,14 +40,14 @@
             </div>
 
             {# COLUNA DA DIREITA: Últimas Senhas Chamadas #}
-            <div class="col-12 col-md-6 mb-4 d-flex justify-content-center"> {# Centraliza o card na coluna #}
+            <div class="col-12 col-md-6 mb-4 d-flex justify-content-center"> 
                 <div class="card p-4 shadow-lg last-called-card">
                     <div class="card-body">
                         <h3 class="card-title text-secondary mb-3">Últimas Chamadas</h3>
-                        <div id="last-called-list" class="d-flex flex-column align-items-center"> {# Garante empilhamento vertical #}
+                        <div id="last-called-list" class="d-flex flex-column align-items-center"> 
                             {% for code in last_called_or_attended_codes %}
-                                <div class="mb-2 w-75"> {# Ajusta largura e margem #}
-                                    <span class="badge bg-secondary p-3 last-code-badge d-block"> {# Ocupa a largura total #}
+                                <div class="mb-2 w-75"> 
+                                    <span class="badge bg-secondary p-3 last-code-badge d-block">
                                         {{ code.get_type_of_code_display|slice:"0" }}{{ code.code }}
                                     </span>
                                 </div>

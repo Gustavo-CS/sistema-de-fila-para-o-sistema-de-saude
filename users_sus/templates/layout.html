@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -21,7 +21,9 @@
     crossorigin="anonymous"
   ></script>
 
-  <link rel="shortcut icon" href="../static/imgs/favicon-32x32.png" type="image/x-icon" />
+  {% load static %} 
+  <link rel="shortcut icon" href="{% static 'imgs/favicon-32x32.png' %}" type="image/x-icon" />
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 
   <title>{% block title %}{% endblock %}</title>
 </head>
@@ -29,32 +31,41 @@
   <nav class="navbar navbar-expand-lg bg-white border-bottom shadow p-3 fw-medium position-relative z-3">
   <div class="container-fluid">
     <a class="navbar-brand fw-bold d-flex align-items-center" href="/">
-      <img src="../static/imgs/favicon-32x32.png" width="30" class="d-inline-block align-text-top me-2" alt="logo" />
-      <span class="align-middle">Sus</span>
+      <img src="{% static 'imgs/favicon-32x32.png' %}" width="30" class="d-inline-block align-text-top me-2" alt="logo" />
+      <span class="align-middle">+Sus</span>
     </a>
 
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
-      aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarContent">
+    <div class="collapse navbar-collapse" id="navbarNav">
       {% if request.session.username %}
       <ul class="navbar-nav ms-auto d-flex flex-wrap align-items-center">
         {% if request.session.employee_id %}
         <li class="nav-item">
-          <a class="nav-link" href="/create">Create</a>
+          <a class="nav-link" href="/manager/">Painel de Gestão</a> 
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/queue_display/">Painel Recepção</a> 
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/create/">Criar Senha</a> 
         </li>
         {% endif %}
         <li class="nav-item">
-          <a class="nav-link" href="/logout">Logout</a>
+          <a class="nav-link" href="/logout/">Sair</a> 
+        </li>
+        {# Links para pacientes logados #}
+        {% if not request.session.employee_id %}
+        <li class="nav-item">
+          <a class="nav-link" href="/">Fila Digital</a> 
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/scheduling">Scheduling</a>
+          <a class="nav-link" href="/scheduling/">Agendar consulta</a> 
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/feedback">Feedback</a>
-        </li>
+        {% endif %}
         <li class="nav-item my-2 my-lg-0">
           <div class="px-3 py-1 bg-primary rounded d-flex align-items-center text-white">
             <i class="bi bi-person-circle me-2"></i>
@@ -67,10 +78,10 @@
       {% else %}
       <ul class="navbar-nav ms-auto d-flex flex-wrap align-items-center">
         <li class="nav-item">
-          <a class="nav-link" href="/register">Register</a>
+          <a class="nav-link" href="/register/">Cadastre-se</a>
         </li>
         <li class="nav-item">
-          <a class="btn btn-primary fw-bold font-monospace" href="/login">Login</a>
+          <a class="btn btn-primary fw-bold font-monospace" href="/login/">Entrar</a> 
         </li>
       </ul>
       {% endif %}
@@ -79,5 +90,6 @@
 </nav>
 
   <main>{% block main %}{% endblock %}</main>
+
 </body>
 </html>
