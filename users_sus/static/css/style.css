@@ -1,0 +1,289 @@
+/* users_sus/static/css/styles.css */
+
+/* Variáveis de Cores e Temas (baseado nos protótipos) */
+:root {
+    --primary-blue: #007bff; /* Azul primário para botões, títulos, links */
+    --light-blue-bg: #e0f2f7; /* Cor de fundo da página (azul claro) */
+    --dark-blue: #0056b3; /* Azul mais escuro para cards de destaque */
+    --card-shadow: rgba(0, 0, 0, 0.15); /* Sombra suave para cards */
+    --button-hover-darken: 10%; /* Percentual para escurecer botões no hover */
+    --text-white: #fff;
+    --text-dark: #343a40; /* Cor padrão para textos escuros */
+    --secondary-gray: #6c757d; /* Cinza para textos secundários ou badges */
+}
+
+/* Estilo Geral do Corpo da Página */
+body {
+    background-color: var(--light-blue-bg);
+    font-family: 'Arial', sans-serif; /* Exemplo de fonte, ajuste conforme protótipo */
+    color: var(--text-dark);
+    padding-top: 70px; /* Espaço para a navbar fixa no topo */
+}
+
+/* --- Navbar Personalizada --- */
+.navbar-brand span {
+    color: var(--primary-blue);
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+.navbar-nav .nav-link {
+    color: var(--text-dark);
+    font-weight: 500;
+    margin-left: 0.5rem; /* Espaçamento entre links */
+    margin-right: 0.5rem;
+}
+.navbar-nav .nav-link:hover {
+    color: var(--primary-blue);
+}
+.navbar-nav .btn {
+    border-radius: 20px; /* Botões mais arredondados na nav */
+    padding: 8px 20px;
+}
+.navbar-nav .btn-primary {
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
+    color: var(--text-white);
+}
+.navbar-nav .btn-primary:hover {
+    background-color: darken(var(--primary-blue), var(--button-hover-darken));
+    border-color: darken(var(--primary-blue), var(--button-hover-darken));
+}
+.navbar-nav .bg-primary { /* Estilo do badge de usuário logado */
+    background-color: var(--primary-blue) !important;
+}
+.navbar-nav .text-truncate { /* Para o nome de usuário */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+
+/* --- Estilos da Página de Login (login.html) --- */
+
+.login-page-wrapper {
+    max-width: 960px; /* Limita a largura do container principal */
+}
+
+.login-content-row {
+    background-color: #fff; /* Fundo branco para a área de conteúdo (ilustração + form) */
+    border-radius: 15px; /* Bordas arredondadas para o container geral */
+    overflow: hidden; /* Garante que as bordas arredondadas funcionem com a imagem */
+    box-shadow: 0 0 20px var(--card-shadow); /* Sombra sutil para todo o bloco */
+}
+
+/* Estilo da ilustração */
+.login-illustration-col {
+    background-color: #f8f9fa; /* Um fundo claro para a coluna da ilustração */
+    padding: 20px; /* Espaçamento interno */
+}
+
+.login-illustration-img {
+    max-height: 400px; /* Limita a altura da imagem para não ser muito grande */
+    width: auto;
+}
+
+/* Estilo do card de login */
+.login-form-col {
+    padding: 0; /* Remove padding para o card preencher a coluna */
+}
+.login-card-custom {
+    border: none; /* Remove a borda padrão do Bootstrap card */
+    border-radius: 15px; /* Bordas arredondadas */
+    width: 100%; /* Ocupa a largura total da coluna */
+    max-width: 450px; /* Limita a largura máxima do card */
+    padding: 30px; /* Padding interno do card */
+    background-color: #fff; /* Fundo branco explícito */
+}
+
+.login-title {
+    color: var(--primary-blue); /* Cor do título LOGIN/ENTRAR */
+    font-weight: bold;
+    font-size: 2.5rem; /* Aumenta um pouco o tamanho do título */
+}
+.login-subtitle {
+    color: var(--primary-blue);
+    font-weight: bold;
+    font-size: 1.75rem; /* Tamanho para subtítulos Paciente/Funcionário */
+}
+
+.login-input {
+    border-radius: 8px; /* Bordas arredondadas para inputs */
+    padding: 12px 15px; /* Padding maior para inputs */
+    font-size: 1.1rem;
+}
+
+.login-button-custom {
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
+    border-radius: 8px; /* Bordas arredondadas */
+    font-weight: bold;
+    padding: 12px 0; /* Padding vertical para o botão */
+    font-size: 1.2rem;
+    color: var(--text-white);
+}
+
+.login-button-custom:hover {
+    background-color: darken(var(--primary-blue), var(--button-hover-darken));
+    border-color: darken(var(--primary-blue), var(--button-hover-darken));
+}
+
+.google-login-section {
+    /* Pode precisar de ajustes específicos para o botão do Google se ele não se alinhar */
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.register-text {
+    color: var(--secondary-gray);
+}
+
+.register-link-custom {
+    color: var(--primary-blue);
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.register-link-custom:hover {
+    text-decoration: underline;
+}
+
+/* --- Estilos da Página de Display da Fila (queue_display.html) --- */
+
+.queue-display-wrapper {
+    background: linear-gradient(135deg, #e0f2f7, #cce5ff); /* Gradiente suave */
+    padding: 0;
+    margin: 0;
+}
+
+.queue-title {
+    color: var(--primary-blue);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+    font-size: 3.5rem; /* Título da unidade na tela da fila */
+}
+
+/* Card da Senha Atual */
+.current-code-card {
+    background-color: var(--dark-blue);
+    color: var(--text-white);
+    border-radius: 25px;
+    max-width: 480px;
+    width: 90%;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    margin-bottom: 3rem !important;
+    min-height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+.current-code-card .card-body {
+    padding: 0 !important;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.current-code-card .card-title {
+    color: var(--text-white);
+    font-weight: 400;
+    letter-spacing: 3px;
+    font-size: 2.2rem;
+    margin-bottom: 1rem !important;
+}
+
+.current-code-number {
+    font-size: 8rem;
+    font-weight: 900;
+    text-shadow: 4px 4px 8px rgba(0,0,0,0.4);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.current-code-card .lead {
+    font-size: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.no-current-code {
+    font-weight: bold;
+    font-size: 2.5rem;
+}
+
+/* Card das Últimas Chamadas */
+.last-called-card {
+    background-color: var(--text-white);
+    border-radius: 15px;
+    max-width: 480px;
+    width: 90%;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    padding: 1.5rem;
+}
+
+.last-called-card .card-title {
+    color: var(--secondary-gray);
+    font-weight: bold;
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.last-called-card #last-called-list {
+    width: 100%;
+}
+
+.last-code-badge {
+    background-color: var(--secondary-gray) !important;
+    color: var(--text-white);
+    font-size: 1.5rem;
+    padding: 12px 20px !important;
+    border-radius: 10px;
+    min-width: 120px;
+    display: block;
+    text-align: center;
+    margin: 0 auto 12px auto !important;
+    font-weight: bold;
+}
+
+/* Ajustes para alinhar os cards nas colunas */
+.row.align-items-start.justify-content-center {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    gap: 30px; /* Espaçamento entre as colunas */
+}
+.col-12.col-md-6.d-flex.justify-content-center {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Media Queries para Responsividade */
+@media (max-width: 767.98px) {
+    .login-illustration-col {
+        display: none; /* Esconde a ilustração em telas menores */
+    }
+    .queue-title {
+        font-size: 2.5rem;
+    }
+    .current-code-number {
+        font-size: 6rem;
+    }
+    .current-code-card, .last-called-card {
+        padding: 1rem !important;
+    }
+    .last-code-badge {
+        font-size: 1rem;
+        padding: 8px 12px !important;
+    }
+    .login-card-custom {
+        padding: 20px;
+    }
+    .login-title {
+        font-size: 2rem;
+    }
+    .login-subtitle {
+        font-size: 1.5rem;
+    }
+}
