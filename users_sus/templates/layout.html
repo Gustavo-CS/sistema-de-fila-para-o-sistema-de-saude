@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -24,6 +26,8 @@
   {% load static %} 
   <link rel="shortcut icon" href="{% static 'imgs/favicon-32x32.png' %}" type="image/x-icon" />
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  
+  <link href="{% static 'css/style.css' %}" rel="stylesheet">
 
   <title>{% block title %}{% endblock %}</title>
 </head>

@@ -16,4 +16,6 @@ urlpatterns = [
     path("scheduling/", views.scheduling_view, name="scheduling"),
     path("queue_display/", views.queue_display_view, name="queue_display"),
 
+    path('fila/<str:numero_senha>/', views.fila_view, name='tela_fila'),
+    path('api/status/<str:numero_senha>/', views.api_status_fila, name='api_status_fila'),
 ]

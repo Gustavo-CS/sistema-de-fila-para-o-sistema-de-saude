@@ -1,0 +1,94 @@
+{# users_sus/templates/tela_fila.html #}
+{% extends "layout.html" %}
+
+{% block title %}
+Criar Senha
+{% endblock %}
+
+{% load static %}
+
+{% block main %}
+
+<body class="d-flex flex-column vh-100" data-api-url="{% url 'api_status_fila' numero_senha=sua_senha.id %}">
+  <main class="flex-grow-1 d-flex align-items-center justify-content-center p-3 main-background">
+    
+    <div class="card shadow p-md-5 text-center fila-card rounded-4">
+      <div class="card-body">
+
+        <div class="d-flex gap-5 justify-content-between align-items-center rounded-4 p-3 px-5 mb-2  bg-primario">
+          <span class="fs-2 bg-primario text-white fw-bold">Sua senha:</span>
+          <strong class="fs-2 fw-bold text-white">{{ sua_senha.code }}</strong>
+        </div>
+
+        {% if sua_senha.type_of_code == "P" %}
+          <div class="mb-4">
+            <span class="badge rounded-pill bg-primary fs-6 fw-medium px-4 py-2">
+              preferencial
+            </span>
+          </div>
+        {% endif %}
+        
+        <div class="d-flex gap-3 justify-content-between align-items-center my-5">
+          <span class="fs-5 text-azul fw-bold fs-2">Senha atual:</span>
+          <div id="senha-atual-valor" class="fw-bold bg-primario fs-2 text-white rounded-5 p-1 px-5">
+            {{ senha_atual }}
+          </div>
+        </div>
+        
+        <p class="posicao fs-3 text-azul">
+          Você está na <strong id="posicao-valor" class="fw-bold">{{ posicao }}ª</strong> posição
+        </p>
+
+      </div>
+    </div>
+  </main>
+</body>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const senhaAtualEl = document.getElementById('senha-atual-valor');
+    const pPosicaoEl = document.querySelector('.posicao');
+
+    const apiUrl = document.body.dataset.apiUrl;
+
+    if (!senhaAtualEl || !pPosicaoEl || !apiUrl) {
+      console.error("Erro Crítico: Um ou mais elementos do DOM ou a URL da API não foram encontrados. Verifique os IDs e o atributo 'data-api-url'.");
+      return;
+    }
+
+    const fetchStatus = async () => {
+      console.log("Buscando status em:", new Date().toLocaleTimeString());
+
+      try {
+        const response = await fetch(apiUrl, { cache: 'no-cache' });
+
+        if (!response.ok) {
+          throw new Error(`Erro de rede: Status ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        senhaAtualEl.textContent = data.senha_atual;
+
+        if (data.posicao > 0) {
+          pPosicaoEl.innerHTML = `Você está na <strong id="posicao-valor">${data.posicao}ª</strong> posição`;
+        } else {
+          if (data.seu_status === 'Em Atendimento') {
+            pPosicaoEl.innerHTML = '<strong>É a sua vez! Dirija-se ao guichê.</strong>';
+          } else {
+            pPosicaoEl.innerHTML = `<strong>Atendimento ${data.seu_status.toLowerCase()}.</strong>`;
+          }
+        }
+
+      } catch (error) {
+        console.error("Falha ao atualizar o status:", error);
+      }
+    };
+    fetchStatus();
+
+    //chama a função repetidamente a cada 10 segundos.
+    setInterval(fetchStatus, 10000);
+  });
+</script>
+
+{% endblock %} {# NÃO REMOVA ESTA LINHA! #}

@@ -13,6 +13,7 @@ from google.auth.transport import requests
 from .forms import FeedbackForm
 from .choices import UNIDADES_POR_ESTADO
 
+from django.db.models import Count
 
 
 @csrf_exempt
@@ -275,3 +276,49 @@ def unidades_por_estado_view(request):
     estado = request.GET.get('estado')
     unidades = UNIDADES_POR_ESTADO.get(estado, [])
     return JsonResponse(unidades, safe=False)
+
+def fila_view(request, numero_senha):
+    """Renderiza a página inicial com os dados da fila."""
+    minha_senha = get_object_or_404(Code, pk=numero_senha)
+    senha_atual = get_senha_em_atendimento()
+
+    posicao = Code.objects.filter(
+        status='AGU',
+        created__lt=minha_senha.created,
+        type_of_code=minha_senha.type_of_code
+    ).count() + 1
+
+    context = {
+        'sua_senha': minha_senha,
+        'senha_atual': senha_atual.code if senha_atual else "---",
+        'posicao': posicao
+    }
+    return render(request, 'tela_fila.html', context)
+
+def get_senha_em_atendimento():
+    """Busca a última senha chamada que está 'EM_ATENDIMENTO'."""
+    senha_atual = Code.objects.filter(status='ATE').order_by('-created').first()
+    return senha_atual
+
+def api_status_fila(request, numero_senha):
+    """Fornece dados atualizados da fila para o frontend."""
+    minha_senha = get_object_or_404(Code, pk=numero_senha)
+    
+    if minha_senha.status != 'AGU':
+        posicao = 0
+    else:
+        posicao = Code.objects.filter(
+            status='AGU',
+            created__lt=minha_senha.created,
+            type_of_code=minha_senha.type_of_code
+        ).count() + 1
+
+    senha_atual = get_senha_em_atendimento()
+
+    data = {
+        'senha_atual': senha_atual.code if senha_atual else "---",
+        'posicao': posicao,
+        'seu_status': minha_senha.get_status_display()
+    }
+    
+    return JsonResponse(data)

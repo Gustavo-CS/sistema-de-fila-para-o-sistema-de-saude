@@ -34,7 +34,7 @@
         <div class="list-group list-group-flush border-bottom scrollarea">
     
             {% for code in codes %}
-            <div class="list-group-item list-group-item-danger py-3 lh-sm" aria-current="true">
+            <div class="list-group-item list-group-item-danger py-3 lh-sm" aria-current="true" onclick="acompanhar('{{ code.id }}')">
                 <div class="d-flex w-100 align-items-center justify-content-between">
                     <strong class="mb-1">{{ code.code }}</strong>
                     <small>{{ code.type_of_code }}</small>
@@ -86,6 +86,11 @@
             hour12: true
         }).replace('AM', 'a.m.').replace('PM', 'p.m.');
     };
+    
+    function acompanhar(id) {
+      // alert(id)
+      window.location.href = `/fila/${id}`;
+    }
 </script>
 
 {% endblock %}
