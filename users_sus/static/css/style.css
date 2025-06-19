@@ -263,6 +263,14 @@ body {
     background-color: #00007E; 
 }
 
+.bg-secundario {
+    background-color: #AEE1F2;
+}
+
+.bg-cinza {
+    background-color: #BFBFBF
+}
+
 .text-azul {
     color: #00007E;
 }

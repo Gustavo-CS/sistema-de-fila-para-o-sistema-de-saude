@@ -18,4 +18,5 @@ urlpatterns = [
 
     path('fila/<str:numero_senha>/', views.fila_view, name='tela_fila'),
     path('api/status/<str:numero_senha>/', views.api_status_fila, name='api_status_fila'),
+    path('search-senhas/', views.search_senhas, name='search_senhas'),
 ]

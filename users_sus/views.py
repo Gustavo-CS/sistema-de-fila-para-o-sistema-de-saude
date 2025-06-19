@@ -322,3 +322,28 @@ def api_status_fila(request, numero_senha):
     }
     
     return JsonResponse(data)
+
+def search_senhas(request):
+    """
+    Esta view é chamada pelo JavaScript.
+    Ela recebe um termo de busca, filtra as senhas no banco de dados
+    e retorna uma lista de senhas em formato JSON.
+    """
+
+    term = request.GET.get('term', '')
+    
+    senha_encontradas = []
+    
+    
+    if len(term) >= 1:
+        senhas_qs = Code.objects.filter(code__icontains=term)[:4]
+        
+        for senha in senhas_qs:
+            senha_encontradas.append({
+                'id': senha.id,
+                'code': senha.code,
+                'preferencial': senha.type_of_code,
+                'status': senha.status,
+            })
+            
+    return JsonResponse({'senhas': senha_encontradas})
