@@ -9,42 +9,35 @@
 
     <h2 class="mb-4">Enviar Feedback</h2>
 
-    <form method="post" id="feedback-form" novalidate>
-        {% csrf_token %}
-        <div class="mb-3">
-            {{ form.estado.label_tag }}
-            {{ form.estado }}
+    {% if request.user.is_authenticated %}
+        <form method="post" id="feedback-form" novalidate>
+            {% csrf_token %}
+            <div class="mb-3">
+                {{ form.unidade_sus.label_tag }}
+                {{ form.unidade_sus }}
+            </div>
+            <div class="mb-3">
+                {{ form.titulo.label_tag }}
+                {{ form.titulo }}
+            </div>
+            <div class="mb-3">
+                {{ form.comentario.label_tag }}
+                {{ form.comentario }}
+            </div>
+            <button type="submit" class="btn btn-primary">Enviar</button>
+        </form>
+    {% else %}
+        <div class="alert alert-info">
+            <strong>Quer enviar seu feedback?</strong> 
+            <a href="/login/">Faça login</a> ou <a href="/register/">crie uma conta</a> para participar.
         </div>
-        <div class="mb-3">
-            {{ form.unidade_sus.label_tag }}
-            {{ form.unidade_sus }}
-        </div>
-        <div class="mb-3">
-            {{ form.titulo.label_tag }}
-            {{ form.titulo }}
-        </div>
-        <div class="mb-3">
-            {{ form.comentario.label_tag }}
-            {{ form.comentario }}
-        </div>
-        <button type="submit" class="btn btn-primary">Enviar</button>
-    </form>
+    {% endif %}
 
     <hr class="my-4">
 
     <h3>Feedbacks</h3>
 
     <form method="get" id="filtro-feedbacks" class="row g-3 mb-4">
-        <div class="col-md-6">
-            <label for="filtro-estado" class="form-label">Estado</label>
-            <select id="filtro-estado" name="estado" class="form-select">
-                <option value="">Selecione um estado</option>
-                {% for sigla, nome in estados_choices %}
-                    <option value="{{ sigla }}" {% if estado_selecionado == sigla %}selected{% endif %}>{{ nome }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
         <div class="col-md-6">
             <label for="filtro-unidade" class="form-label">Unidade SUS</label>
             <select id="filtro-unidade" name="unidade" class="form-select">
@@ -76,62 +69,4 @@
     </div>
 
 </div>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-$(function() {
-    $('#filtro-estado').change(function() {
-        const estado = $(this).val();
-        const unidadeSelect = $('#filtro-unidade');
-        unidadeSelect.empty();
-
-        if (estado) {
-            $.ajax({
-                url: "{% url 'unidades_por_estado' %}",
-                data: { estado: estado },
-                success: function(data) {
-                    unidadeSelect.append($('<option>').val('todas').text('Todas as unidades'));
-                    if (data.length) {
-                        data.forEach(function(unidade) {
-                            unidadeSelect.append($('<option>').val(unidade[0]).text(unidade[1]));
-                        });
-                    } else {
-                        unidadeSelect.append($('<option>').val('').text('Nenhuma unidade encontrada'));
-                    }
-                }
-            });
-        } else {
-            unidadeSelect.append($('<option>').val('').text('Selecione um estado primeiro'));
-        }
-    });
-
-    $('#id_estado').change(function() {
-        const estado = $(this).val();
-        const unidadeSelect = $('#id_unidade_sus');
-        unidadeSelect.empty();
-
-        if (estado) {
-            $.ajax({
-                url: "{% url 'unidades_por_estado' %}",
-                data: { estado: estado },
-                success: function(data) {
-                    unidadeSelect.append($('<option>').val('').text('Selecione uma unidade'));
-                    if (data.length) {
-                        data.forEach(function(unidade) {
-                            unidadeSelect.append($('<option>').val(unidade[0]).text(unidade[1]));
-                        });
-                    } else {
-                        unidadeSelect.append($('<option>').val('').text('Nenhuma unidade encontrada'));
-                    }
-                }
-            });
-        } else {
-            unidadeSelect.append($('<option>').val('').text('Selecione um estado primeiro'));
-        }
-    });
-
-    $('#filtro-estado').trigger('change');
-    $('#id_estado').trigger('change');
-});
-</script>
 {% endblock %}

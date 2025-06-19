@@ -38,6 +38,7 @@
                             <li class="nav-item"><a class="nav-link" href="/">Fila Digital</a></li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'scheduling' %}">Agendar Consulta</a></li>
                             <li class="nav-item"><a class="nav-link" href="{% url 'meus_agendamentos' %}">Meus Agendamentos</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/feedback/">Feedback</a> </li>
                         {% endif %}
                         <li class="nav-item"><a class="nav-link" href="/logout/">Sair</a></li>
                         <li class="nav-item my-2 my-lg-0">
@@ -51,6 +52,7 @@
                     </ul>
                 {% else %}
                     <ul class="navbar-nav ms-auto d-flex flex-wrap align-items-center">
+                        <li class="nav-item"><a class="nav-link" href="/feedback/">Feedback</a> </li>
                         <li class="nav-item"><a class="nav-link" href="/register/">Cadastre-se</a></li>
                         <li class="nav-item"><a class="btn btn-primary fw-bold font-monospace" href="/login/">Entrar</a></li>
                     </ul>

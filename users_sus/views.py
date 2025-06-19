@@ -12,8 +12,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from google.oauth2 import id_token
 from google.auth.transport import requests
-from .forms import FeedbackForm
-from .choices import UNIDADES_POR_ESTADO
+from .forms import FeedbackForm, UNIDADES_SUS_CHOICES
 
 from django.db.models import Count
 
@@ -185,34 +184,33 @@ def logout_view(request):
 def create_view(request):
     return render(request, "create.html")
 
+
+def scheduling_view(request):
+    return render(request, "scheduling.html")
+
+
 def feedback(request):
-    estado_selecionado = request.GET.get('estado', '')
     unidade_selecionada = request.GET.get('unidade', '')
 
-    feedbacks_qs = Feedback.objects.none()
+    todas_unidades = []
+    for grupo in UNIDADES_SUS_CHOICES:
+        todas_unidades.extend(grupo[1])
 
-    if estado_selecionado:
-        unidades_do_estado = [codigo for codigo, nome in UNIDADES_POR_ESTADO.get(estado_selecionado, [])]
+    codigos_disponiveis = [codigo for codigo, nome in todas_unidades]
 
-        if unidade_selecionada and unidade_selecionada != 'todas':
-            feedbacks_qs = Feedback.objects.filter(unidade_sus=unidade_selecionada).order_by('-criado_em')
-        else:
-            feedbacks_qs = Feedback.objects.filter(unidade_sus__in=unidades_do_estado).order_by('-criado_em')
-
+    feedbacks_qs = Feedback.objects.all().order_by('-criado_em')
+    if unidade_selecionada and unidade_selecionada != 'todas':
+        feedbacks_qs = feedbacks_qs.filter(unidade_sus=unidade_selecionada)
 
     feedbacks_processados = []
     for fb in feedbacks_qs:
-        nome_unidade = None
-        for unidades in UNIDADES_POR_ESTADO.values():
-            for codigo, nome in unidades:
-                if codigo == fb.unidade_sus:
-                    nome_unidade = nome
+        nome_unidade = next((nome for codigo, nome in todas_unidades if codigo == fb.unidade_sus), fb.unidade_sus)
         feedbacks_processados.append({
             'titulo': fb.titulo,
             'comentario': fb.comentario,
             'criado_em': fb.criado_em,
             'user': fb.user,
-            'unidade_nome': nome_unidade or fb.unidade_sus,
+            'unidade_nome': nome_unidade,
         })
 
     if request.method == 'POST':
@@ -229,27 +227,15 @@ def feedback(request):
     else:
         form = FeedbackForm()
 
-    estados_choices = [(sigla, sigla) for sigla in UNIDADES_POR_ESTADO.keys()]
-    unidades_do_estado = UNIDADES_POR_ESTADO.get(estado_selecionado, [])
-
-    unidades_para_filtro = [('todas', 'Todas as unidades')] + unidades_do_estado
+    unidades_para_filtro = [('todas', 'Todas as unidades')] + todas_unidades
 
     context = {
         'form': form,
         'feedbacks': feedbacks_processados,
-        'estado_selecionado': estado_selecionado,
         'unidade_selecionada': unidade_selecionada,
-        'estados_choices': estados_choices,
         'unidades_para_filtro': unidades_para_filtro,
     }
     return render(request, 'feedback.html', context)
-
-
-@require_GET
-def unidades_por_estado_view(request):
-    estado = request.GET.get('estado')
-    unidades = UNIDADES_POR_ESTADO.get(estado, [])
-    return JsonResponse(unidades, safe=False)
 
 def fila_view(request, numero_senha):
     minha_senha = get_object_or_404(Code, pk=numero_senha)
