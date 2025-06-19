@@ -6,6 +6,8 @@ from django.utils import timezone
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
+from .models import Agendamento, HealthUnit, Worker 
+
 from .models import Code, HealthUnit, StatusSenha, Worker, TipoSenha, User
 from .decorators import worker_required 
 
@@ -172,3 +174,20 @@ def update_code_status(request, code_id): # Aqui code_id será int
             }
         )
         return JsonResponse({'success': True, 'new_status': code_instance.get_status_display()})
+    
+
+@worker_required
+def sched_logs(request):
+    worker = request.user.worker
+    health_unit = worker.health_unit
+
+    lista_de_agendamentos = Agendamento.objects.filter(
+        health_unit=health_unit
+    ).select_related('usuario').order_by('-data_agendamento')
+
+    context = {
+        'health_unit': health_unit,
+        'agendamentos': lista_de_agendamentos,
+    }
+    
+    return render(request, "manager/sched_logs.html", context)

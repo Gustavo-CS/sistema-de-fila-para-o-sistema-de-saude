@@ -128,3 +128,16 @@ class Feedback(models.Model):
 
     def __str__(self):
         return f"{self.titulo} ({self.unidade_sus})"
+    
+    # No final do seu models.py
+
+class Agendamento(models.Model):
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='agendamentos')
+    health_unit = models.ForeignKey(HealthUnit, on_delete=models.CASCADE, related_name='agendamentos')
+    especialidade = models.CharField(max_length=100)
+    data_agendamento = models.DateTimeField()
+    status = models.CharField(max_length=50, default='Confirmado')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.usuario.username} - {self.especialidade} em {self.data_agendamento.strftime("%d/%m/%Y")}'

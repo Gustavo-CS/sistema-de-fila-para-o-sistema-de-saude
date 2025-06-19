@@ -1,8 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import login, logout
-from users_sus.models import User, Code, Worker, Patient, HealthUnit, TipoSenha, StatusSenha, Feedback
+from users_sus.models import User, Code, Worker, Patient, HealthUnit, TipoSenha, StatusSenha, Feedback, Agendamento
 from django.urls import reverse
 from django.views.decorators.http import require_GET
+from django.contrib.auth.decorators import login_required
+from datetime import datetime
 
 import os
 
@@ -37,31 +39,26 @@ def auth_receiver(request):
     try:
         user = User.objects.get(email=email)
 
-        #lógica para redirecionar funcionários para o painel de gestão
-        if hasattr(user, 'worker') and user.is_staff: # verifica se o usuário é um worker e tem is_staff=True
+        if hasattr(user, 'worker') and user.is_staff:
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             request.session['username'] = user.username
             request.session['employee_id'] = str(user.worker.employee_id) 
             return redirect(reverse('manager_dashboard')) 
         
-        #lógica para login de paciente (se não for worker)
         elif hasattr(user, 'patient'):
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             request.session['username'] = user.username
             request.session['id'] = user.id 
             return redirect("/")
         else:
-            #caso o usuário exista, mas não seja nem paciente nem funcionário
             return redirect("/register") 
 
     except User.DoesNotExist:
-        #se não existe, vai para registro
         return redirect("/register")
 
     return redirect('/') 
 
 def queue_display_view(request):
-    # UUID DA UNIDADE DE SAÚDE 
     health_unit = get_object_or_404(HealthUnit, id='62d1ca25-e6df-4246-accd-17869aef97f4')
 
     if not health_unit:
@@ -84,9 +81,6 @@ def queue_display_view(request):
     }
     return render(request, "queue_display.html", context) 
 
-
-
-# Create your views here.
 def index(request):
     codes = Code.objects.order_by('-created')[:30]
     return render(request, "index.html", {'codes': codes})
@@ -109,7 +103,6 @@ def register_view(request):
         if not request.POST.get('phone'):
             return redirect("/register")
         
-
         if len(request.POST.get('phone')) != 11 or not request.POST.get('phone').isdigit():
             return redirect("/register")
 
@@ -141,7 +134,6 @@ def login_view(request):
         
         try:
             user = User.objects.get(email=email)
-            #verifica se o usuário é um Patient
             if not hasattr(user, 'patient'):
                 return render(request, "login.html", {'error': 'Credenciais inválidas. Verifique seu email e senha.'})
             
@@ -153,36 +145,25 @@ def login_view(request):
             else:
                 return render(request, "login.html", {'error': 'Senha incorreta.'})
         except User.DoesNotExist:
-
             return render(request, "login.html", {'error': 'Usuário não encontrado.'})
     return render(request, "login.html") 
 
 
 def login_worker(request):
-    print("--- Tentativa de Login de Funcionário ---")
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
         
-        print(f"Email recebido: {email}")
-        
         try:
             user = User.objects.get(email=email)
-            print(f"Usuário encontrado: {user.email}")
-            print(f"Usuário é staff: {user.is_staff}")
-            print(f"Usuário tem worker associado: {hasattr(user, 'worker')}")
 
             if not hasattr(user, 'worker') or not user.is_staff:
-                print("ERRO: Usuário não é um worker ou não é staff.")
                 return render(request, "login.html", {'error': 'Credenciais inválidas ou não é um funcionário autorizado.'})
 
-            # Se o usuário é um Worker, tenta fazer o login
             if user.check_password(password):
-                print("Senha CORRETA. Logando e redirecionando.")
                 login(request, user, backend='django.contrib.auth.backends.ModelBackend')
                 
                 request.session.save() 
-                print("Sessão salva.") 
 
                 request.session['username'] = user.username
                 request.session['employee_id'] = str(user.worker.employee_id)
@@ -190,13 +171,10 @@ def login_worker(request):
                 return redirect(reverse('manager_dashboard'))
 
             else:
-                print("ERRO: Senha INCORRETA.")
                 return render(request, "login.html", {'error': 'Senha incorreta.'})
         except User.DoesNotExist:
-            print("ERRO: Usuário NÃO ENCONTRADO com este email.")
             return render(request, "login.html", {'error': 'Usuário não encontrado.'})
     
-    print("Requisição GET ou não POST. Renderizando formulário.")
     return render(request, "login.html")
 
 def logout_view(request):
@@ -206,10 +184,6 @@ def logout_view(request):
 
 def create_view(request):
     return render(request, "create.html")
-
-
-def scheduling_view(request):
-    return render(request, "scheduling.html")
 
 def feedback(request):
     estado_selecionado = request.GET.get('estado', '')
@@ -278,7 +252,6 @@ def unidades_por_estado_view(request):
     return JsonResponse(unidades, safe=False)
 
 def fila_view(request, numero_senha):
-    """Renderiza a página inicial com os dados da fila."""
     minha_senha = get_object_or_404(Code, pk=numero_senha)
     senha_atual = get_senha_em_atendimento()
 
@@ -296,12 +269,10 @@ def fila_view(request, numero_senha):
     return render(request, 'tela_fila.html', context)
 
 def get_senha_em_atendimento():
-    """Busca a última senha chamada que está 'EM_ATENDIMENTO'."""
     senha_atual = Code.objects.filter(status='ATE').order_by('-created').first()
     return senha_atual
 
 def api_status_fila(request, numero_senha):
-    """Fornece dados atualizados da fila para o frontend."""
     minha_senha = get_object_or_404(Code, pk=numero_senha)
     
     if minha_senha.status != 'AGU':
@@ -322,6 +293,70 @@ def api_status_fila(request, numero_senha):
     }
     
     return JsonResponse(data)
+
+@login_required
+def scheduling_view(request):
+    unidades = HealthUnit.objects.all().order_by('name')
+    context = {
+        'unidades_de_saude': unidades
+    }
+    return render(request, 'scheduling.html', context) 
+
+@login_required
+def salvar_agendamento(request):
+    if request.method == 'POST':
+        
+        unidade_id = request.POST.get('unidade_id')
+        especialidade_selecionada = request.POST.get('especialidade')
+        data_selecionada = request.POST.get('data_consulta') 
+        horario_selecionado = request.POST.get('horario_consulta') 
+
+        data_hora_string = f'{data_selecionada} {horario_selecionado}'
+        data_hora_obj = datetime.strptime(data_hora_string, '%Y-%m-%d %H:%M')
+
+        unidade = HealthUnit.objects.get(id=unidade_id)
+
+        Agendamento.objects.create(
+            usuario=request.user,
+            health_unit=unidade,
+            especialidade=especialidade_selecionada,
+            data_agendamento=data_hora_obj,
+            status='Confirmado'
+        )
+        
+        return redirect('meus_agendamentos')
+
+    return redirect('scheduling')
+
+@login_required
+def meus_agendamentos_view(request):
+    meus_agendamentos = Agendamento.objects.filter(usuario=request.user).order_by('-data_agendamento')
+    context = {
+        'agendamentos': meus_agendamentos
+    }
+    return render(request, 'meus_agendamentos.html', context)
+
+@login_required
+def sched_logs_view(request):
+    if not hasattr(request.user, 'worker'):
+        return redirect('index')
+
+    worker = request.user.worker
+    health_unit = worker.health_unit
+
+    if not health_unit:
+        return render(request, "sched_logs.html", {'error': 'Você não está associado a uma unidade de saúde.'})
+
+    lista_de_agendamentos = Agendamento.objects.filter(
+        health_unit=health_unit
+    ).select_related('usuario').order_by('-data_agendamento')
+
+    context = {
+        'health_unit': health_unit,
+        'agendamentos': lista_de_agendamentos,
+    }
+    
+    return render(request, "sched_logs.html", context)
 
 def search_senhas(request):
     """

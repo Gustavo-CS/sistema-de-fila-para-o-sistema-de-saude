@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Agendamentos da Unidade
+{% endblock %}
+
+{% block main %}
+<div class="container mt-4">
+    <h2 class="mb-4">Agendamentos - {% if health_unit %}{{ health_unit.name }}{% else %}Unidade não definida{% endif %}</h2>
+
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% else %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Paciente</th>
+                        <th scope="col">Especialidade</th>
+                        <th scope="col">Data e Hora</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for agendamento in agendamentos %}
+                    <tr>
+                        <td>{{ agendamento.usuario.username }}</td>
+                        <td>{{ agendamento.especialidade }}</td>
+                        <td>{{ agendamento.data_agendamento|date:"d/m/Y, H:i" }}</td>
+                        <td>
+                            <span class="badge bg-success">{{ agendamento.status }}</span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-4">
+                            Nenhum agendamento encontrado para esta unidade.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -6,161 +6,56 @@
 
 {% block main %}
 
-        <div class="list-group list-group-flush border-bottom scrollarea">
-
-        {% for code in codes %}
-        <div class="list-group-item list-group-item-danger py-3 lh-sm" aria-current="true">
-            <div class="d-flex w-100 align-items-center justify-content-between">
-                <strong class="mb-1">{{ code.code }}</strong>
-                <small>{{ code.type_of_code }}</small>
-            </div>
-            <div class="col-10 mb-1 small">{{ code.created }}</div>
-        </div>
-        {% endfor %} 
-    </div>
-
 <div class="container mt-5">
     <div class="row justify-content-center"> 
-        <div class="col-md-6"> 
-            <h1 class="mb-4 text-center">Agendamento SUS</h1>
+        <div class="col-md-8"> 
+            <h1 class="mb-4 text-center">Agendamento de Consulta</h1>
 
-            <form>
-                <div class="mb-3">
-                    <label for="estado" class="form-label">Estado</label>
-                    <select id="estado" name="estado" class="form-select">
-                        <option value="" selected>Selecione o Estado...</option>
-                        <option value="AC">Acre</option>
-                        <option value="AL">Alagoas</option>
-                        <option value="AP">Amapá</option>
-                        <option value="AM">Amazonas</option>
-                        <option value="BA">Bahia</option>
-                        <option value="CE">Ceará</option>
-                        <option value="DF">Distrito Federal</option>
-                        <option value="ES">Espírito Santo</option>
-                        <option value="GO">Goiás</option>
-                        <option value="MA">Maranhão</option>
-                        <option value="MT">Mato Grosso</option>
-                        <option value="MS">Mato Grosso do Sul</option>
-                        <option value="MG">Minas Gerais</option>
-                        <option value="PA">Pará</option>
-                        <option value="PB">Paraíba</option>
-                        <option value="PR">Paraná</option>
-                        <option value="PE">Pernambuco</option>
-                        <option value="PI">Piauí</option>
-                        <option value="RJ">Rio de Janeiro</option>
-                        <option value="RN">Rio Grande do Norte</option>
-                        <option value="RS">Rio Grande do Sul</option>
-                        <option value="RO">Rondônia</option>
-                        <option value="RR">Roraima</option>
-                        <option value="SC">Santa Catarina</option>
-                        <option value="SP">São Paulo</option>
-                        <option value="SE">Sergipe</option>
-                        <option value="TO">Tocantins</option>
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <label for="cidade" class="form-label">Cidade</label>
-                    <select id="cidade" name="cidade" class="form-select" disabled>
-                        <option value="" selected>Selecione a Cidade...</option>
-                        <option value="sao_paulo_capital">São Paulo (Capital)</option>
-                        <option value="campinas">Campinas</option>
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <label for="unidade" class="form-label">Unidade</label>
-                    <select id="unidade" name="unidade" class="form-select" disabled>
-                        <option value="" selected>Selecione a Unidade...</option>
-                        <option value="ubs_centro">UBS Centro</option>
-                        <option value="hospital_municipal">Hospital Municipal</option>
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                        <label for="especialidadesSelect" class="form-label">Especialidades</label>
-                        <select id="especialidadesSelect" name="especialidades" class="form-select">
-                            <option value="" selected>Selecione a Especialidade...</option>
-                            <option value="Acupuntura">Acupuntura</option>
-                            <option value="Alergia e Imunologia">Alergia e Imunologia</option>
-                            <option value="Anestesiologia">Anestesiologia</option>
-                            <option value="Angiologia">Angiologia</option>
-                            <option value="Cardiologia">Cardiologia</option>
-                            <option value="Cirurgia Cardiovascular">Cirurgia Cardiovascular</option>
-                            <option value="Cirurgia da Mão">Cirurgia da Mão</option>
-                            <option value="Cirurgia de Cabeça e Pescoço">Cirurgia de Cabeça e Pescoço</option>
-                            <option value="Cirurgia do Aparelho Digestivo">Cirurgia do Aparelho Digestivo</option>
-                            <option value="Cirurgia Geral">Cirurgia Geral</option>
-                            <option value="Cirurgia Oncológica">Cirurgia Oncológica</option>
-                            <option value="Cirurgia Pediátrica">Cirurgia Pediátrica</option>
-                            <option value="Cirurgia Plástica">Cirurgia Plástica</option>
-                            <option value="Cirurgia Torácica">Cirurgia Torácica</option>
-                            <option value="Cirurgia Vascular">Cirurgia Vascular</option>
-                            <option value="Clínica Médica">Clínica Médica</option>
-                            <option value="Coloproctologia">Coloproctologia</option>
-                            <option value="Dermatologia">Dermatologia</option>
-                            <option value="Endocrinologia e Metabologia">Endocrinologia e Metabologia</option>
-                            <option value="Endoscopia">Endoscopia</option>
-                            <option value="Gastroenterologia">Gastroenterologia</option>
-                            <option value="Genética Médica">Genética Médica</option>
-                            <option value="Geriatria">Geriatria</option>
-                            <option value="Ginecologia e Obstetrícia">Ginecologia e Obstetrícia</option>
-                            <option value="Hematologia e Hemoterapia">Hematologia e Hemoterapia</option>
-                            <option value="Homeopatia">Homeopatia</option>
-                            <option value="Infectologia">Infectologia</option>
-                            <option value="Mastologia">Mastologia</option>
-                            <option value="Medicina de Emergência">Medicina de Emergência</option>
-                            <option value="Medicina de Família e Comunidade">Medicina de Família e Comunidade</option>
-                            <option value="Medicina do Trabalho">Medicina do Trabalho</option>
-                            <option value="Medicina de Tráfego">Medicina de Tráfego</option>
-                            <option value="Medicina Esportiva">Medicina Esportiva</option>
-                            <option value="Medicina Física e Reabilitação">Medicina Física e Reabilitação</option>
-                            <option value="Medicina Intensiva">Medicina Intensiva</option>
-                            <option value="Medicina Legal e Perícia Médica">Medicina Legal e Perícia Médica</option>
-                            <option value="Medicina Nuclear">Medicina Nuclear</option>
-                            <option value="Medicina Preventiva e Social">Medicina Preventiva e Social</option>
-                            <option value="Nefrologia">Nefrologia</option>
-                            <option value="Neurocirurgia">Neurocirurgia</option>
-                            <option value="Neurologia">Neurologia</option>
-                            <option value="Nutrologia">Nutrologia</option>
-                            <option value="Oftalmologia">Oftalmologia</option>
-                            <option value="Oncologia Clínica">Oncologia Clínica</option>
-                            <option value="Ortopedia e Traumatologia">Ortopedia e Traumatologia</option>
-                            <option value="Otorrinolaringologia">Otorrinolaringologia</option>
-                            <option value="Patologia">Patologia</option>
-                            <option value="Patologia Clínica/Medicina Laboratorial">Patologia Clínica/Medicina Laboratorial</option>
-                            <option value="Pediatria">Pediatria</option>
-                            <option value="Pneumologia">Pneumologia</option>
-                            <option value="Psiquiatria">Psiquiatria</option>
-                            <option value="Radiologia e Diagnóstico por Imagem">Radiologia e Diagnóstico por Imagem</option>
-                            <option value="Radioterapia">Radioterapia</option>
-                            <option value="Reumatologia">Reumatologia</option>
-                            <option value="Urologia">Urologia</option>
+            <form method="POST" action="{% url 'salvar_agendamento' %}">
+                {% csrf_token %} <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="unidade" class="form-label">Unidade de Saúde</label>
+                        <select id="unidade" name="unidade_id" class="form-select" required>
+                            <option value="" selected>Selecione a Unidade...</option>
+                            {% for unidade in unidades_de_saude %}
+                                <option value="{{ unidade.id }}">{{ unidade.name }}</option>
+                            {% endfor %}
                         </select>
                     </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="especialidade" class="form-label">Especialidade</label>
+                        <select id="especialidade" name="especialidade" class="form-select" required>
+                            <option value="" selected>Selecione a Especialidade...</option>
+                            <option value="Clínica Médica">Clínica Médica</option>
+                            <option value="Cardiologia">Cardiologia</option>
+                            <option value="Dermatologia">Dermatologia</option>
+                            <option value="Ginecologia e Obstetrícia">Ginecologia e Obstetrícia</option>
+                            <option value="Ortopedia e Traumatologia">Ortopedia e Traumatologia</option>
+                            <option value="Pediatria">Pediatria</option>
+                            <option value="Psiquiatria">Psiquiatria</option>
+                        </select>
+                    </div>
+                </div>
 
-                <div class="mb-3">
-                    <label for="horario" class="form-label">Horário</label>
-                    <select id="horario" name="horario" class="form-select" disabled>
-                        <option value="" selected>Selecione o Horário...</option>
-                        <option value="08:00">08:00</option>
-                        <option value="08:30">08:30</option>
-                        <option value="09:00">09:00</option>
-                        <option value="09:30">09:30</option>
-                        <option value="10:00">10:00</option>
-                        <option value="10:30">10:30</option>
-                        <option value="11:00">11:00</option>
-                        <option value="11:30">11:30</option>
-                        <option value="14:00">14:00</option>
-                        <option value="14:30">14:30</option>
-                        <option value="15:00">15:00</option>
-                        <option value="15:30">15:30</option>
-                        <option value="16:00">16:00</option>
-                        <option value="16:30">16:30</option>
-                        <option value="17:00">17:00</option>
-                        <option value="17:30">17:30</option>
-                        <option value="18:00">18:00</option>
-                    </select>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="data" class="form-label">Dia da Consulta</label>
+                        <input type="date" id="data" name="data_consulta" class="form-control" required>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="horario" class="form-label">Horário</label>
+                        <select id="horario" name="horario_consulta" class="form-select" required>
+                            <option value="" selected>Selecione o Horário...</option>
+                            <option value="08:00">08:00</option>
+                            <option value="09:00">09:00</option>
+                            <option value="10:00">10:00</option>
+                            <option value="11:00">11:00</option>
+                            <option value="14:00">14:00</option>
+                            <option value="15:00">15:00</option>
+                            <option value="16:00">16:00</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="d-grid gap-2 col-md-8 mx-auto mt-4"> 
@@ -170,63 +65,5 @@
         </div>
     </div>
 </div>
-
-
-    </form>
-    
-    
-    </div>
-</div>
-
-
-<script type="text/javascript">
-    console.log(window.location.host)
-
-
-    const estadoSelect = document.getElementById('estado');
-    const cidadeSelect = document.getElementById('cidade');
-    const unidadeSelect = document.getElementById('unidade');
-    const horarioSelect = document.getElementById('horario');
-
-    if (estadoSelect) {
-        estadoSelect.addEventListener('change', function() {
-            if (this.value) {
-                cidadeSelect.disabled = false;
-            } else {
-                cidadeSelect.disabled = true;
-                cidadeSelect.value = "";
-                unidadeSelect.disabled = true;
-                unidadeSelect.value = "";
-                horarioSelect.disabled = true;
-                horarioSelect.value = "";
-            }
-        });
-    }
-
-    if (cidadeSelect) {
-        cidadeSelect.addEventListener('change', function() {
-            if (this.value) {
-                unidadeSelect.disabled = false;
-            } else {
-                unidadeSelect.disabled = true;
-                unidadeSelect.value = "";
-                horarioSelect.disabled = true;
-                horarioSelect.value = "";
-            }
-        });
-    }
-    
-    if (unidadeSelect) { 
-        unidadeSelect.addEventListener('change', function() {
-            if (this.value) {
-                horarioSelect.disabled = false;
-            } else {
-                horarioSelect.disabled = true;
-                horarioSelect.value = "";
-            }
-        });
-    }
-
-</script>
 
 {% endblock %}

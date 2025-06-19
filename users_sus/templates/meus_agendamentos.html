@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Meus Agendamentos
+{% endblock %}
+
+{% block main %}
+<div class="container mt-5">
+    <h1 class="mb-4">Meus Agendamentos</h1>
+
+    {% if agendamentos %}
+        <div class="list-group">
+            {% for agendamento in agendamentos %}
+                <div class="list-group-item list-group-item-action flex-column align-items-start mb-2">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1 text-primary">{{ agendamento.especialidade }}</h5>
+                        <small class="text-muted">{{ agendamento.data_agendamento|date:"d/m/Y, H:i" }}</small>
+                    </div>
+                    <p class="mb-1"><strong>Unidade:</strong> {{ agendamento.health_unit.name }}</p>
+                    <small><strong>Status:</strong> <span class="badge bg-success">{{ agendamento.status }}</span></small>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center" role="alert">
+            Você ainda não possui agendamentos. <a href="{% url 'scheduling' %}" class="alert-link">Clique aqui para agendar</a>.
+        </div>
+    {% endif %}
+
+    <div class="mt-4 text-center">
+        <a href="{% url 'scheduling' %}" class="btn btn-primary">Fazer Novo Agendamento</a>
+    </div>
+</div>
+{% endblock %}
