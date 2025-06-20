@@ -8,7 +8,7 @@
 
 {% block main %}
 <div class="container-fluid min-vh-100 d-flex flex-column align-items-center justify-content-center text-center py-5 queue-display-wrapper">
-
+    
     {% if error %}
         <div class="alert alert-danger" role="alert">
             {{ error }}
@@ -18,22 +18,22 @@
     {% if health_unit %}
         <h1 class="display-3 fw-bold mb-4 queue-title">{{ health_unit.name }}</h1>
 
-        <div class="row w-100 align-items-start justify-content-center">
+        <div class="queue-grid-container"> 
             {# COLUNA DA ESQUERDA: Senha Atual #}
-            <div class="col-12 col-md-6 mb-4 d-flex justify-content-center">
+            <div class="queue-grid-item current-code-card-wrapper"> 
                 <div class="card p-4 shadow-lg current-code-card">
                     <div class="card-body">
-                        <h2 class="card-title display-5 mb-4 text-primary fw-bold">SENHA ATUAL</h2>
+                        <h2 class="card-title display-5 mb-4 fw-bold">SENHA ATUAL</h2> {# CLASSE text-primary REMOVIDA AQUI #}
                         <div id="current-calling-display">
                             {% if calling_code %}
                                 <p class="display-1 fw-bolder text-info current-code-number">
                                     {{ calling_code.get_type_of_code_display|slice:"0" }}{{ calling_code.code }}
                                 </p>
-                                <p class="lead text-muted">
+                                <p class="lead"> {# CLASSE text-muted REMOVIDA AQUI #}
                                     Chamando... ({{ calling_code.get_type_of_code_display }})
                                 </p>
                             {% else %}
-                                <p class="display-3 text-secondary no-current-code">Aguardando Chamada</p>
+                                <p class="display-3 no-current-code">Aguardando Chamada</p> {# CLASSE text-secondary REMOVIDA AQUI #}
                             {% endif %}
                         </div>
                     </div>
@@ -41,7 +41,7 @@
             </div>
 
             {# COLUNA DA DIREITA: Últimas Senhas Chamadas #}
-            <div class="col-12 col-md-6 mb-4 d-flex justify-content-center">
+            <div class="queue-grid-item last-called-card-wrapper"> 
                 <div class="card p-4 shadow-lg last-called-card">
                     <div class="card-body">
                         <h3 class="card-title text-secondary mb-3">Últimas Chamadas</h3>
@@ -59,9 +59,8 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        {# Script para o WebSocket #}
+        </div> 
+        
         <script>
             const HEALTH_UNIT_ID = "{{ health_unit.id }}"; 
 
@@ -72,11 +71,11 @@
                     return;
                 }
                 queueSocket = new WebSocket(`ws://${window.location.host}/ws/queue/${HEALTH_UNIT_ID}/`);
-
+                
                 queueSocket.onopen = function(e) {
                     console.log("QUEUE_DISPLAY: WebSocket conectado à fila da unidade:", HEALTH_UNIT_ID);
                 };
-
+                
                 queueSocket.onmessage = function(e) {
                     const data = JSON.parse(e.data);
                     console.log('QUEUE_DISPLAY: Mensagem WebSocket recebida:', data);

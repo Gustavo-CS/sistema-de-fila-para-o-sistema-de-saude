@@ -70,8 +70,7 @@ def queue_display_view(request):
 
     last_called_or_attended_codes = Code.objects.filter(
         health_unit=health_unit
-    ).exclude(status__in=[StatusSenha.AGUARDANDO, StatusSenha.CANCELADO, StatusSenha.PERDEU]).order_by('-called_at', '-attended_at')[:10]
-
+    ).exclude(status__in=[StatusSenha.AGUARDANDO, StatusSenha.CANCELADO, StatusSenha.PERDEU]).order_by('-called_at', '-attended_at')[:6] # ALTERADO AQUI
     context = {
         'health_unit': health_unit,
         'calling_code': calling_code,
