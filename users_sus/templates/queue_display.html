@@ -8,7 +8,7 @@
 
 {% block main %}
 <div class="container-fluid min-vh-100 d-flex flex-column align-items-center justify-content-center text-center py-5 queue-display-wrapper">
-    
+
     {% if error %}
         <div class="alert alert-danger" role="alert">
             {{ error }}
@@ -18,8 +18,9 @@
     {% if health_unit %}
         <h1 class="display-3 fw-bold mb-4 queue-title">{{ health_unit.name }}</h1>
 
-        <div class="row w-100 align-items-start justify-content-center"> 
-            <div class="col-12 col-md-6 mb-4 d-flex justify-content-center"> 
+        <div class="row w-100 align-items-start justify-content-center">
+            {# COLUNA DA ESQUERDA: Senha Atual #}
+            <div class="col-12 col-md-6 mb-4 d-flex justify-content-center">
                 <div class="card p-4 shadow-lg current-code-card">
                     <div class="card-body">
                         <h2 class="card-title display-5 mb-4 text-primary fw-bold">SENHA ATUAL</h2>
@@ -40,13 +41,13 @@
             </div>
 
             {# COLUNA DA DIREITA: Últimas Senhas Chamadas #}
-            <div class="col-12 col-md-6 mb-4 d-flex justify-content-center"> 
+            <div class="col-12 col-md-6 mb-4 d-flex justify-content-center">
                 <div class="card p-4 shadow-lg last-called-card">
                     <div class="card-body">
                         <h3 class="card-title text-secondary mb-3">Últimas Chamadas</h3>
-                        <div id="last-called-list" class="d-flex flex-column align-items-center"> 
+                        <div id="last-called-list" class="d-flex flex-column align-items-center">
                             {% for code in last_called_or_attended_codes %}
-                                <div class="mb-2 w-75"> 
+                                <div class="mb-2 w-75">
                                     <span class="badge bg-secondary p-3 last-code-badge d-block">
                                         {{ code.get_type_of_code_display|slice:"0" }}{{ code.code }}
                                     </span>
@@ -58,11 +59,10 @@
                     </div>
                 </div>
             </div>
-        </div> {# Fim da row #}
+        </div>
 
-        {# Script para o WebSocket (mantenha como está, fora da row) #}
+        {# Script para o WebSocket #}
         <script>
-            // Obtém o UUID da unidade de saúde do contexto do Django
             const HEALTH_UNIT_ID = "{{ health_unit.id }}"; 
 
             let queueSocket;
@@ -72,11 +72,11 @@
                     return;
                 }
                 queueSocket = new WebSocket(`ws://${window.location.host}/ws/queue/${HEALTH_UNIT_ID}/`);
-                
+
                 queueSocket.onopen = function(e) {
                     console.log("QUEUE_DISPLAY: WebSocket conectado à fila da unidade:", HEALTH_UNIT_ID);
                 };
-                
+
                 queueSocket.onmessage = function(e) {
                     const data = JSON.parse(e.data);
                     console.log('QUEUE_DISPLAY: Mensagem WebSocket recebida:', data);
