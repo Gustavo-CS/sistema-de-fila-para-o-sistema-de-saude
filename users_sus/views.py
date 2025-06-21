@@ -86,40 +86,43 @@ def index(request):
 
 def register_view(request):
     if request.method == 'POST':
-        if not request.POST.get('username'):
-            return redirect("/register")
-
-        if not request.POST.get('email'):
-            return redirect("/register")
-
-        if not request.POST.get('date'):
-            return redirect("/register")
-        
-        if not request.POST.get('address'):
-            return redirect("/register")
-        
-        if not request.POST.get('phone'):
-            return redirect("/register")
-        
-        if len(request.POST.get('phone')) != 11 or not request.POST.get('phone').isdigit():
-            return redirect("/register")
-
-        if request.POST.get('password') != request.POST.get('confirmation'):
-            return redirect("/register")
-
         username = request.POST.get('username')
         email = request.POST.get('email')
-        password = request.POST.get('password')
         date = request.POST.get('date')
-        phone_number = request.POST.get('phone')
         address = request.POST.get('address')
+        phone = request.POST.get('phone')
+        password = request.POST.get('password')
+        confirmation = request.POST.get('confirmation')
+
+        # Validações básicas
+        if not all([username, email, date, address, phone, password, confirmation]):
+            return render(request, "register.html", {
+                "error": "Preencha todos os campos corretamente."
+            })
+
+        if len(phone) != 11 or not phone.isdigit():
+            return render(request, "register.html", {
+                "error": "O telefone deve conter exatamente 11 dígitos numéricos."
+            })
+
+        if password != confirmation:
+            return render(request, "register.html", {
+                "error": "As senhas não coincidem."
+            })
+
+        # Verifica se o email já está cadastrado
+        if User.objects.filter(email=email).exists():
+            return render(request, "register.html", {
+                "error": "Este e-mail já está em uso. Tente outro."
+            })
 
         user = User(username=username, email=email, birth_date=date)
         user.set_password(password)
         user.save()
 
-        patient = Patient(phone_number=phone_number, address=address, user=user)
+        patient = Patient(phone_number=phone, address=address, user=user)
         patient.save()
+
         return redirect("/login")
 
     return render(request, "register.html")

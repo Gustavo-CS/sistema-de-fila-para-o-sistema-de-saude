@@ -34,6 +34,11 @@
         </div>
         <button class="btn btn-primary d-block mx-auto w-auto" type="submit">Cadastrar</button>
     </form>
+    {% if error %}
+        <div class="alert alert-danger text-center">
+    {{ error }}
+        </div>
+    {% endif %}
 
     <p class="text-center mt-4 mb-4 text-muted">
         Já tem uma conta?
@@ -55,13 +60,38 @@
         });
 
         const alert = document.getElementById("alertMessage");
+        const password = document.getElementById("password");
+        const confirmation = document.getElementById("confirmation");
+
+        // Verifica se todos os campos estão preenchidos
         if (!allFilled) {
+            alert.innerText = "Preencha todos os campos corretamente.";
             alert.style.display = "block";
-            return false; // impede envio
-        } else {
-            alert.style.display = "none";
-            return true;
+            return false;
         }
+
+        // Verifica se as senhas coincidem
+        if (password.value !== confirmation.value) {
+            confirmation.value = "";
+            alert.innerText = "As senhas não coincidem. Tente novamente.";
+            alert.style.display = "block";
+            confirmation.focus();
+            return false;
+        }
+
+        const today = new Date();
+        const birthDate = new Date(dob.value);
+
+        if (isNaN(birthDate.getTime()) || birthDate > today) {
+            alert.innerText = "A data de nascimento deve ser válida e não pode estar no futuro.";
+            alert.style.display = "block";
+            dob.focus();
+            return false;
+        }
+
+        // Tudo OK
+        alert.style.display = "none";
+        return true;
     }
 </script>
 {% endblock %}
