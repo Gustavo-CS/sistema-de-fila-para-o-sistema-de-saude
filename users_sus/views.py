@@ -15,6 +15,10 @@ from google.auth.transport import requests
 from .forms import FeedbackForm, UNIDADES_SUS_CHOICES
 
 from django.db.models import Count
+from django.db.models import Q
+
+from django.utils.timezone import now
+from datetime import date
 
 
 @csrf_exempt
@@ -69,9 +73,16 @@ def queue_display_view(request):
         status=StatusSenha.CHAMANDO
     ).order_by('-called_at').first()
 
+    if calling_code:
+        calling_code.formatted = format_code(calling_code.type_of_code, calling_code.code)
+
     last_called_or_attended_codes = Code.objects.filter(
         health_unit=health_unit
     ).exclude(status__in=[StatusSenha.AGUARDANDO, StatusSenha.CANCELADO, StatusSenha.PERDEU]).order_by('-called_at', '-attended_at')[:6] # ALTERADO AQUI
+
+    for code in last_called_or_attended_codes:
+        code.formatted = format_code(code.type_of_code, code.code)
+
     context = {
         'health_unit': health_unit,
         'calling_code': calling_code,
@@ -81,7 +92,14 @@ def queue_display_view(request):
     return render(request, "queue_display.html", context) 
 
 def index(request):
-    codes = Code.objects.order_by('-created')[:30]
+    hoje = now().date()
+    codes = Code.objects.filter(
+      created__date=hoje
+    ).order_by('created')[:30]
+
+    for code in codes:
+        code.formatted = format_code(code.type_of_code, code.code)
+
     return render(request, "index.html", {'codes': codes})
 
 
@@ -243,9 +261,18 @@ def feedback(request):
     }
     return render(request, 'feedback.html', context)
 
+def format_code(type_of_code, code):
+    return f"{type_of_code}{str(code).zfill(3)}"
+
 def fila_view(request, numero_senha):
-    minha_senha = get_object_or_404(Code, pk=numero_senha)
+    hoje = date.today()
+    type_code = numero_senha[0]
+    num_code = int(numero_senha[1:])
+    minha_senha = get_object_or_404(Code, Q(code=num_code) & Q(type_of_code=type_code) & Q(created__date=hoje))
     senha_atual = get_senha_em_atendimento()
+
+    minha_senha.formatted = format_code(minha_senha.type_of_code, minha_senha.code)
+    senha_atual.formatted = format_code(senha_atual.type_of_code, senha_atual.code)
 
     posicao = Code.objects.filter(
         status='AGU',
@@ -255,7 +282,7 @@ def fila_view(request, numero_senha):
 
     context = {
         'sua_senha': minha_senha,
-        'senha_atual': senha_atual.code if senha_atual else "---",
+        'senha_atual': senha_atual if senha_atual else "---",
         'posicao': posicao
     }
     return render(request, 'tela_fila.html', context)
@@ -265,7 +292,10 @@ def get_senha_em_atendimento():
     return senha_atual
 
 def api_status_fila(request, numero_senha):
-    minha_senha = get_object_or_404(Code, pk=numero_senha)
+    hoje = date.today()
+    type_code = numero_senha[0]
+    num_code = int(numero_senha[1:])
+    minha_senha = get_object_or_404(Code, Q(code=num_code) & Q(type_of_code=type_code) & Q(created__date=hoje))
     
     if minha_senha.status != 'AGU':
         posicao = 0
@@ -361,9 +391,9 @@ def search_senhas(request):
     
     senha_encontradas = []
     
-    
+    hoje = date.today()
     if len(term) >= 1:
-        senhas_qs = Code.objects.filter(code__icontains=term)[:4]
+        senhas_qs = Code.objects.filter(code__icontains=term, created__date=hoje)[:4]
         
         for senha in senhas_qs:
             senha_encontradas.append({

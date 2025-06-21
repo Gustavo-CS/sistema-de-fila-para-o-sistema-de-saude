@@ -11,6 +11,9 @@ from .models import Agendamento, HealthUnit, Worker
 from .models import Code, HealthUnit, StatusSenha, Worker, TipoSenha, User
 from .decorators import worker_required 
 
+def format_code(type_of_code, code):
+    return f"{type_of_code}{str(code).zfill(3)}"
+
 @worker_required
 def manager_dashboard(request):
     worker = request.user.worker
@@ -25,11 +28,17 @@ def manager_dashboard(request):
         status=StatusSenha.AGUARDANDO
     ).order_by('-type_of_code', 'created')
 
+    for code in waiting_codes:
+        code.formatted = format_code(code.type_of_code, code.code)
+
     # Senha em atendimento (se houver)
     in_service_code = Code.objects.filter(
         health_unit=health_unit,
         status=StatusSenha.EM_ATENDIMENTO
     ).first()
+
+    if in_service_code:
+      in_service_code.formatted = format_code(in_service_code.type_of_code, in_service_code.code)
 
     # Senha que está sendo chamada (se houver)
     calling_code = Code.objects.filter(
@@ -37,11 +46,17 @@ def manager_dashboard(request):
         status=StatusSenha.CHAMANDO
     ).first()
 
+    if calling_code:
+      calling_code.formatted = format_code(calling_code.type_of_code, calling_code.code)
+
     # Últimas senhas atendidas
     attended_codes = Code.objects.filter(
         health_unit=health_unit,
         status=StatusSenha.ATENDIDO
     ).order_by('-attended_at')[:5]
+
+    for code in attended_codes:
+        code.formatted = format_code(code.type_of_code, code.code)
 
     context = {
         'health_unit': health_unit,

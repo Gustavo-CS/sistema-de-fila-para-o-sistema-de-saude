@@ -17,7 +17,7 @@ Criar Senha
 
         <div class="d-flex gap-5 justify-content-between align-items-center rounded-4 p-3 px-5 mb-2  bg-primario">
           <span class="fs-2 bg-primario text-white fw-bold">Sua senha:</span>
-          <strong class="fs-2 fw-bold text-white">{{ sua_senha.code }}</strong>
+          <strong class="fs-2 fw-bold text-white">{{ sua_senha.formatted }}</strong>
         </div>
 
         {% if sua_senha.type_of_code == "P" %}
@@ -28,16 +28,22 @@ Criar Senha
           </div>
         {% endif %}
         
-        <div class="d-flex gap-3 justify-content-between align-items-center my-5">
-          <span class="fs-5 text-azul fw-bold fs-2">Senha atual:</span>
-          <div id="senha-atual-valor" class="fw-bold bg-primario fs-2 text-white rounded-5 p-1 px-5">
-            {{ senha_atual }}
+        {% if sua_senha.status == "AGU" %}
+          <div class="d-flex gap-3 justify-content-between align-items-center my-5">
+            <span class="fs-5 text-azul fw-bold fs-2">Senha atual:</span>
+            <div id="senha-atual-valor" class="fw-bold bg-primario fs-2 text-white rounded-5 p-1 px-5">
+              {{ senha_atual.formatted }}
+            </div>
           </div>
-        </div>
-        
-        <p class="posicao fs-3 text-azul">
-          Você está na <strong id="posicao-valor" class="fw-bold">{{ posicao }}ª</strong> posição
-        </p>
+          
+          <p class="posicao fs-3 text-azul">
+            Você está na <strong id="posicao-valor" class="fw-bold">{{ posicao }}ª</strong> posição
+          </p>
+        {% else %}
+          <p class="text-center fs-4 text-muted my-5">
+            Sua senha já foi chamada.
+          </p>
+        {% endif %}
 
       </div>
     </div>

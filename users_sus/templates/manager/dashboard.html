@@ -17,9 +17,14 @@
                     <h5 class="card-title">Chamando Senha</h5>
                     <div id="calling-code-display">
                         {% if calling_code %}
-                            <p class="card-text display-4">
-                                {{ calling_code.get_type_of_code_display }} {{ calling_code.code }}
-                            </p>
+                            <div class="d-flex w-100 align-items-center justify-content-between">
+                              <p class="card-text display-4">
+                                  {{ calling_code.formatted }} 
+                              </p>
+                              {% if calling_code.type_of_code == "P" %}
+                                <p class="card-text fs-2 rounded-4 mx-2 px-3">Preferencial</p>
+                              {% endif %}
+                            </div>
                             <p class="card-text">Chamada às: {{ calling_code.called_at|date:"H:i:s" }} por {{ calling_code.called_by.user.username }}</p>
                             <form action="{% url 'update_code_status' calling_code.id %}" method="post" style="display:inline;" class="form-update-status">
                                 {% csrf_token %}
@@ -55,9 +60,14 @@
                     <h5 class="card-title">Em Atendimento</h5>
                     <div id="in-service-code-display">
                         {% if in_service_code %}
-                            <p class="card-text display-4">
-                                {{ in_service_code.get_type_of_code_display }} {{ in_service_code.code }}
-                            </p>
+                            <div class="d-flex w-100 align-items-center justify-content-between">
+                              <p class="card-text display-4">
+                                  {{ in_service_code.formatted }} 
+                              </p>
+                              {% if in_service_code.type_of_code == "P" %}
+                                <p class="card-text fs-2 rounded-4 mx-2 px-3">Preferencial</p>
+                              {% endif %}
+                            </div>
                             <p class="card-text">Iniciou às: {{ in_service_code.called_at|date:"H:i:s" }} por {{ in_service_code.called_by.user.username }}</p>
                             <form action="{% url 'update_code_status' in_service_code.id %}" method="post" class="form-update-status">
                                 {% csrf_token %}
@@ -87,7 +97,7 @@
                     <ul id="waiting-codes-list" class="list-group">
                         {% for code in waiting_codes %}
                             <li class="list-group-item">
-                                **{{ code.get_type_of_code_display }} {{ code.code }}** - Criada em: {{ code.created|date:"H:i:s" }}
+                              **{{ code.formatted }}** - Criada em: {{ code.created|date:"H:i:s" }}
                             </li>
                         {% empty %}
                             <li class="list-group-item">Nenhuma senha aguardando no momento.</li>
@@ -105,7 +115,7 @@
                     <ul id="attended-codes-list" class="list-group">
                         {% for code in attended_codes %}
                             <li class="list-group-item">
-                                **{{ code.get_type_of_code_display }} {{ code.code }}** - Atendida em: {{ code.attended_at|date:"H:i:s" }}
+                                **{{ code.formatted }}** - Atendida em: {{ code.attended_at|date:"H:i:s" }}
                             </li>
                         {% empty %}
                             <li class="list-group-item">Nenhuma senha atendida recentemente.</li>

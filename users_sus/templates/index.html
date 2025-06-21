@@ -10,7 +10,7 @@
         <p class="bg-secundario rounded-4 px-3 py-2 fs-3">Insira sua senha para acompanhar a fila de forma remota!</p>
         <!-- O formulário não é estritamente necessário para o autocomplete, mas é bom tê-lo -->
         <div id="searchForm" class="d-flex gap-5 justify-content-center align-items-center py-3" action="/sua-url-de-busca-final/" method="get" autocomplete="off">
-            <p class="my-auto fs-3">digite aqui:</p>
+            <p class="my-auto fs-3">Digite aqui:</p>
             <div class="position-relative">
               <input type="text" class="bg-cinza rounded-3 border-0 fs-3 w-100" id="searchInput" name="q" placeholder="">
               <div id="suggestions-box" class="position-absolute rounded-3 w-100"></div>
@@ -30,10 +30,14 @@
         <div class="list-group list-group-flush border-bottom scrollarea">
     
             {% for code in codes %}
-            <div class="list-group-item list-group-item-danger py-3 lh-sm" aria-current="true" onclick="acompanhar('{{ code.id }}')">
+                        <div class="list-group-item list-group-item-danger py-3 lh-sm" aria-current="true" onclick="acompanhar('{{ code.formatted }}')">
+
                 <div class="d-flex w-100 align-items-center justify-content-between">
-                    <strong class="mb-1">{{ code.code }}</strong>
-                    <small>{{ code.type_of_code }}</small>
+                    <strong class="mb-1"
+                        data-type="{{ code.type_of_code }}"
+                        data-code="{{ code.code }}">
+                    </strong>
+                    <p class="my-auto">{{code.status}}</p>
                 </div>
                 <div class="col-10 mb-1 small">{{ code.created }}</div>
             </div>
@@ -61,8 +65,7 @@
         codeItem.className = 'list-group-item list-group-item-danger py-3 lh-sm';
         codeItem.innerHTML = `
             <div class="d-flex w-100 align-items-center justify-content-between">
-                <strong class="mb-1">${data.code}</strong>
-                <small>${data.type_of_code}</small>
+                <strong class="mb-1">${formatCode(data.type_of_code, data.code)}</strong>
             </div>
             <div class="col-10 mb-1 small">${formatDate(data.created)}</div>
         `;
@@ -83,9 +86,8 @@
         }).replace('AM', 'a.m.').replace('PM', 'p.m.');
     };
     
-    function acompanhar(id) {
-      // alert(id)
-      window.location.href = `/fila/${id}`;
+    function acompanhar(code) {
+      window.location.href = `/fila/${code}`;
     }
 
     const searchInput = document.getElementById('searchInput');
@@ -116,14 +118,14 @@
                 suggestionsBox.innerHTML = '';
 
                 data.senhas.forEach(paciente => {
+                    const code = formatCode(paciente.preferencial, paciente.code)
                     const div = document.createElement('div');
                     div.className = 'suggestion-item d-flex justify-content-around border border-1 rounded-3 bg-white';
-                    div.innerHTML = `<p class="my-auto py-1">${paciente.code}</p>
-                    <p class="my-auto py-1">${paciente.status}</p>
-                    <p class="my-auto py-1">${paciente.preferencial}</p>`
+                    div.innerHTML = `<p class="my-auto py-1">${code}</p>
+                    <p class="my-auto py-1">${paciente.status}</p>`
                     
                     div.addEventListener('click', function() {
-                      window.location.href = `/fila/${paciente.id}`;
+                      window.location.href = `/fila/${code}`;
                     });
 
                     suggestionsBox.appendChild(div);
@@ -133,6 +135,18 @@
                 console.error('Erro ao buscar sugestões:', error);
                 suggestionsBox.innerHTML = `<div class="suggestion-item" style="color: red;">Erro ao buscar.</div>`;
             });
+    });
+
+    function formatCode(type_of_code, code) {
+        console.log(type_of_code, code)
+        let number = `${code}`;
+        return `${type_of_code}${String(number).padStart(3, '0')}`;
+    }
+
+    document.querySelectorAll('strong[data-type][data-code]').forEach(el => {
+        const type = el.dataset.type;
+        const code = el.dataset.code;
+        el.textContent = formatCode(type, code);
     });
 
     document.addEventListener('click', function(event) {
