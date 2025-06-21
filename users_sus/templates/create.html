@@ -14,11 +14,32 @@
         <p id="senhaGerada" class="mt-3" style="font-size: 2em; color: green;"></p>
     </div>
 
+    <div class="modal fade" id="codeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-center">
+                <div class="modal-header">
+                    <h5 class="modal-title w-100">Senha Gerada</h5>
+                </div>
+                <div class="modal-body">
+                    <h1 id="generatedCode" class="display-4 text-primary"></h1>
+                </div>
+                <div class="modal-body">
+                    <canvas id="qrcode-container"></canvas>
+                </div>
+                <div class="modal-body">
+                    <p id="createdDate"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
     <script>
         // ==============================================================
         // SUBSTITUA PELO UUID DA SUA HEALTHUNIT REAL!
         // Use o UUID EXATO que você obteve do admin!
-        const HEALTH_UNIT_ID = "302f7e14-f2dd-4904-8e34-ef5e495170cd"; // <-- COLOQUE SEU UUID AQUI NOVAMENTE!
+        const HEALTH_UNIT_ID = "{{ request.session.health_unit_id|default:'' }}" // <-- COLOQUE SEU UUID AQUI NOVAMENTE!
         // ==============================================================
 
         let socket; 
@@ -41,6 +62,10 @@
                 } else {
                     console.log('Mensagem de atualização da fila (ignorado no create.html):', data);
                 }
+
+                if (data.code) {
+                    showCodeModal(data.code, data.type_of_code, data.created);
+                }
             };
 
             socket.onclose = function(e) {
@@ -60,6 +85,53 @@
                 alert('WebSocket não está conectado. Tentando reconectar...');
                 connectWebSocket();
             }
+        }
+
+        function showCodeModal(code, type_of_code, created) {
+            document.getElementById('generatedCode').textContent = `${formatCode(type_of_code, code)}`;
+            document.getElementById('createdDate').textContent = formatISOToDateTime(created)
+            const modal = new bootstrap.Modal(document.getElementById('codeModal'));
+
+
+            const content = `${window.location.host}/fila/${formatCode(type_of_code, code)}`;  // Manter no padrão da fila digital
+            QRCode.toCanvas(document.getElementById('qrcode-container'), content, function (error) {
+                if (error) console.error(error);
+            });
+
+            modal.show();
+
+            setTimeout(() => {
+                modal.hide();
+            }, 2000);
+        }
+
+        // Função para exibir o horario que aparece no modal em formato YYYY-MM-DD
+        function formatISOToDateTime(isoString) {
+            const date = new Date(isoString);
+
+            const pad = (num) => String(num).padStart(2, '0');
+
+            const year = date.getFullYear();
+            const month = pad(date.getMonth() + 1); // mês começa do zero
+            const day = pad(date.getDate());
+            const hours = pad(date.getHours());
+            const minutes = pad(date.getMinutes());
+            const seconds = pad(date.getSeconds());
+
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+
+        function formatCode(type_of_code, code) {
+            let prefix = '';
+            let number = `${code}`;
+
+            if (type_of_code.startsWith("Prioritária")) {
+                prefix = 'P';
+            } else if (type_of_code.startsWith("Normal")) {
+                prefix = 'N';
+            }
+
+            return `${prefix}${String(number).padStart(3, '0')}`;
         }
 
         document.addEventListener('DOMContentLoaded', connectWebSocket);

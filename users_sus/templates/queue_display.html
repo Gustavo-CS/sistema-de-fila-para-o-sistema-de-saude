@@ -62,7 +62,7 @@
         </div> 
         
         <script>
-            const HEALTH_UNIT_ID = "{{ health_unit.id }}"; 
+            const HEALTH_UNIT_ID = "{{ request.session.health_unit_id|default:'' }}"; 
 
             let queueSocket;
 

@@ -58,7 +58,8 @@ def auth_receiver(request):
     return redirect('/') 
 
 def queue_display_view(request):
-    health_unit = get_object_or_404(HealthUnit, id='62d1ca25-e6df-4246-accd-17869aef97f4')
+    health_unit_id = request.session.get('health_unit_id')
+    health_unit = get_object_or_404(HealthUnit, id=health_unit_id)
 
     if not health_unit:
         return render(request, "queue_display.html", {'error': 'Nenhuma unidade de saúde configurada no sistema. Por favor, cadastre uma no painel de administração.'})
@@ -168,6 +169,9 @@ def login_worker(request):
 
                 request.session['username'] = user.username
                 request.session['employee_id'] = str(user.worker.employee_id)
+
+                if user.worker.health_unit:
+                    request.session['health_unit_id'] = str(user.worker.health_unit.id)
                 
                 return redirect(reverse('manager_dashboard'))
 
