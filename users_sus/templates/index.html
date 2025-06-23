@@ -30,7 +30,7 @@
         <div class="list-group list-group-flush border-bottom scrollarea">
     
             {% for code in codes %}
-                        <div class="list-group-item list-group-item-danger py-3 lh-sm" aria-current="true" onclick="acompanhar('{{ code.formatted }}')">
+                        <div class="list-group-item list-group-item-primary py-3 lh-sm" aria-current="true" onclick="acompanhar('{{ code.formatted }}')">
 
                 <div class="d-flex w-100 align-items-center justify-content-between">
                     <strong class="mb-1"
@@ -62,7 +62,7 @@
         const container = document.querySelector('.list-group');
         
         const codeItem = document.createElement('div');
-        codeItem.className = 'list-group-item list-group-item-danger py-3 lh-sm';
+        codeItem.className = 'list-group-item list-group-item-primary py-3 lh-sm';
         codeItem.innerHTML = `
             <div class="d-flex w-100 align-items-center justify-content-between">
                 <strong class="mb-1">${formatCode(data.type_of_code, data.code)}</strong>

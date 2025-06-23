@@ -268,7 +268,7 @@ def fila_view(request, numero_senha):
     hoje = date.today()
     type_code = numero_senha[0]
     num_code = int(numero_senha[1:])
-    minha_senha = get_object_or_404(Code, Q(code=num_code) & Q(type_of_code=type_code) & Q(created__date=hoje))
+    minha_senha = get_object_or_404(Code, Q(code=num_code) & Q(type_of_code=type_code) & Q(created__date__gte=hoje))
     senha_atual = get_senha_em_atendimento()
 
     minha_senha.formatted = format_code(minha_senha.type_of_code, minha_senha.code)
@@ -295,7 +295,7 @@ def api_status_fila(request, numero_senha):
     hoje = date.today()
     type_code = numero_senha[0]
     num_code = int(numero_senha[1:])
-    minha_senha = get_object_or_404(Code, Q(code=num_code) & Q(type_of_code=type_code) & Q(created__date=hoje))
+    minha_senha = get_object_or_404(Code, Q(code=num_code) & Q(type_of_code=type_code) & Q(created__date__gte=hoje))
     
     if minha_senha.status != 'AGU':
         posicao = 0
@@ -393,7 +393,7 @@ def search_senhas(request):
     
     hoje = date.today()
     if len(term) >= 1:
-        senhas_qs = Code.objects.filter(code__icontains=term, created__date=hoje)[:4]
+        senhas_qs = Code.objects.filter(code__icontains=term, created__date__gte=hoje)[:6]
         
         for senha in senhas_qs:
             senha_encontradas.append({
